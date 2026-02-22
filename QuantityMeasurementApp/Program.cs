@@ -1,4 +1,4 @@
-﻿using QuantityMeasurementApp.Views;
+using QuantityMeasurementApp.Views;
 
 namespace QuantityMeasurementApp
 {

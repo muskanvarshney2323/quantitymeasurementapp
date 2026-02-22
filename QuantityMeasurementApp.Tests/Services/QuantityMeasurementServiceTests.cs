@@ -4,309 +4,291 @@ using QuantityMeasurementApp.Services;
 
 namespace QuantityMeasurementApp.Tests.Services
 {
+    /// <summary>
+    /// Unit test suite for validating QuantityMeasurementService behavior.
+    /// Covers quantity comparison, input parsing, unit conversion checks,
+    /// static comparison helpers, and support for legacy Feet and Inch models.
+    /// </summary>
     [TestClass]
-    public class QuantityMeasurementServiceTestCases
+    public class QuantityMeasurementServiceTests
     {
-        private QuantityMeasurementService _quantityService = null!;
+        private QuantityMeasurementService _service = null!;
 
         [TestInitialize]
-        public void Initialize()
+        public void Init()
         {
-            _quantityService = new QuantityMeasurementService();
+            _service = new QuantityMeasurementService();
         }
 
-        #region Feet Related Tests
+        #region Generic Quantity Validation
 
+        // Verifies equality when both quantities have same value and same unit
         [TestMethod]
-        public void CompareFeet_WhenBothValuesSame_ShouldReturnTrue()
+        public void CompareQuantityEquality_SameUnitSameValue_ShouldReturnTrue()
         {
-            Feet first = new Feet(1.0);
-            Feet second = new Feet(1.0);
+            var q1 = new Quantity(1.0, LengthUnit.FEET);
+            var q2 = new Quantity(1.0, LengthUnit.FEET);
 
-            bool isEqual = _quantityService.CompareFeetEquality(first, second);
-
-            Assert.IsTrue(isEqual);
-        }
-
-        [TestMethod]
-        public void CompareFeet_WhenValuesDifferent_ShouldReturnFalse()
-        {
-            Feet first = new Feet(1.0);
-            Feet second = new Feet(2.0);
-
-            bool isEqual = _quantityService.CompareFeetEquality(first, second);
-
-            Assert.IsFalse(isEqual);
-        }
-
-        [TestMethod]
-        public void CompareFeet_WhenFirstValueIsNull_ShouldReturnFalse()
-        {
-            Feet? first = null;
-            Feet second = new Feet(1.0);
-
-            bool isEqual = _quantityService.CompareFeetEquality(first, second);
-
-            Assert.IsFalse(isEqual);
-        }
-
-        [TestMethod]
-        public void CompareFeet_WhenSecondValueIsNull_ShouldReturnFalse()
-        {
-            Feet first = new Feet(1.0);
-            Feet? second = null;
-
-            bool isEqual = _quantityService.CompareFeetEquality(first, second);
-
-            Assert.IsFalse(isEqual);
-        }
-
-        [TestMethod]
-        public void CompareFeet_WhenBothValuesAreNull_ShouldReturnFalse()
-        {
-            Feet? first = null;
-            Feet? second = null;
-
-            bool isEqual = _quantityService.CompareFeetEquality(first, second);
-
-            Assert.IsFalse(isEqual);
-        }
-
-        [TestMethod]
-        public void ConvertStringToFeet_WhenValidNumberProvided_ShouldCreateFeet()
-        {
-            string inputValue = "3.5";
-
-            Feet? feet = _quantityService.ParseFeetInput(inputValue);
-
-            Assert.IsNotNull(feet);
-            Assert.AreEqual(3.5, feet!.Value, 0.0001);
-        }
-
-        [TestMethod]
-        public void ConvertStringToFeet_WhenInputIsNull_ShouldReturnNull()
-        {
-            string? inputValue = null;
-
-            Feet? feet = _quantityService.ParseFeetInput(inputValue);
-
-            Assert.IsNull(feet);
-        }
-
-        [TestMethod]
-        public void ConvertStringToFeet_WhenInputIsEmpty_ShouldReturnNull()
-        {
-            string inputValue = "";
-
-            Feet? feet = _quantityService.ParseFeetInput(inputValue);
-
-            Assert.IsNull(feet);
-        }
-
-        [TestMethod]
-        public void ConvertStringToFeet_WhenInputIsOnlySpaces_ShouldReturnNull()
-        {
-            string inputValue = "   ";
-
-            Feet? feet = _quantityService.ParseFeetInput(inputValue);
-
-            Assert.IsNull(feet);
-        }
-
-        [TestMethod]
-        public void ConvertStringToFeet_WhenInputIsInvalidText_ShouldReturnNull()
-        {
-            string inputValue = "xyz";
-
-            Feet? feet = _quantityService.ParseFeetInput(inputValue);
-
-            Assert.IsNull(feet);
-        }
-
-        [TestMethod]
-        public void ConvertStringToFeet_WhenNegativeValueProvided_ShouldCreateFeet()
-        {
-            string inputValue = "-2.5";
-
-            Feet? feet = _quantityService.ParseFeetInput(inputValue);
-
-            Assert.IsNotNull(feet);
-            Assert.AreEqual(-2.5, feet!.Value, 0.0001);
-        }
-
-        [TestMethod]
-        public void ConvertStringToFeet_WhenZeroProvided_ShouldCreateFeet()
-        {
-            string inputValue = "0";
-
-            Feet? feet = _quantityService.ParseFeetInput(inputValue);
-
-            Assert.IsNotNull(feet);
-            Assert.AreEqual(0, feet!.Value, 0.0001);
-        }
-
-        [TestMethod]
-        public void StaticFeetComparison_WhenValuesMatch_ShouldReturnTrue()
-        {
-            bool result = QuantityMeasurementService.AreFeetEqual(1.0, 1.0);
+            bool result = _service.CompareQuantityEquality(q1, q2);
 
             Assert.IsTrue(result);
         }
 
+        // Verifies inequality when quantities differ but unit remains same
         [TestMethod]
-        public void StaticFeetComparison_WhenValuesDoNotMatch_ShouldReturnFalse()
+        public void CompareQuantityEquality_SameUnitDifferentValue_ShouldReturnFalse()
         {
-            bool result = QuantityMeasurementService.AreFeetEqual(1.0, 2.0);
+            var q1 = new Quantity(1.0, LengthUnit.FEET);
+            var q2 = new Quantity(2.0, LengthUnit.FEET);
+
+            bool result = _service.CompareQuantityEquality(q1, q2);
+
+            Assert.IsFalse(result);
+        }
+
+        // Ensures correct comparison for equivalent values across units
+        [TestMethod]
+        public void CompareQuantityEquality_EquivalentCrossUnits_ShouldReturnTrue()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.FEET);
+            var q2 = new Quantity(12.0, LengthUnit.INCH);
+
+            bool result = _service.CompareQuantityEquality(q1, q2);
+
+            Assert.IsTrue(result);
+        }
+
+        // Ensures comparison fails for non-matching cross-unit values
+        [TestMethod]
+        public void CompareQuantityEquality_NonEquivalentCrossUnits_ShouldReturnFalse()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.FEET);
+            var q2 = new Quantity(13.0, LengthUnit.INCH);
+
+            bool result = _service.CompareQuantityEquality(q1, q2);
+
+            Assert.IsFalse(result);
+        }
+
+        // Handles scenario when first quantity is null
+        [TestMethod]
+        public void CompareQuantityEquality_FirstQuantityNull_ShouldReturnFalse()
+        {
+            Quantity? q1 = null;
+            var q2 = new Quantity(1.0, LengthUnit.FEET);
+
+            bool result = _service.CompareQuantityEquality(q1, q2);
+
+            Assert.IsFalse(result);
+        }
+
+        // Handles scenario when second quantity is null
+        [TestMethod]
+        public void CompareQuantityEquality_SecondQuantityNull_ShouldReturnFalse()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.FEET);
+            Quantity? q2 = null;
+
+            bool result = _service.CompareQuantityEquality(q1, q2);
+
+            Assert.IsFalse(result);
+        }
+
+        // Handles scenario when both quantities are null
+        [TestMethod]
+        public void CompareQuantityEquality_BothQuantitiesNull_ShouldReturnFalse()
+        {
+            Quantity? q1 = null;
+            Quantity? q2 = null;
+
+            bool result = _service.CompareQuantityEquality(q1, q2);
+
+            Assert.IsFalse(result);
+        }
+
+        // Confirms valid numeric input produces a Quantity object
+        [TestMethod]
+        public void ParseQuantityInput_ValidNumber_ShouldCreateQuantity()
+        {
+            string input = "3.5";
+
+            Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(3.5, result!.Value);
+            Assert.AreEqual(LengthUnit.FEET, result.Unit);
+        }
+
+        // Ensures null input is safely rejected
+        [TestMethod]
+        public void ParseQuantityInput_NullValue_ShouldReturnNull()
+        {
+            string? input = null;
+
+            Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
+
+            Assert.IsNull(result);
+        }
+
+        // Ensures empty string input is rejected
+        [TestMethod]
+        public void ParseQuantityInput_EmptyText_ShouldReturnNull()
+        {
+            string input = "";
+
+            Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
+
+            Assert.IsNull(result);
+        }
+
+        // Ensures whitespace-only input is rejected
+        [TestMethod]
+        public void ParseQuantityInput_WhitespaceOnly_ShouldReturnNull()
+        {
+            string input = "   ";
+
+            Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
+
+            Assert.IsNull(result);
+        }
+
+        // Ensures non-numeric input is rejected
+        [TestMethod]
+        public void ParseQuantityInput_InvalidText_ShouldReturnNull()
+        {
+            string input = "abc";
+
+            Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
+
+            Assert.IsNull(result);
+        }
+
+        // Confirms negative numbers are allowed
+        [TestMethod]
+        public void ParseQuantityInput_NegativeNumber_ShouldCreateQuantity()
+        {
+            string input = "-2.5";
+
+            Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(-2.5, result!.Value);
+        }
+
+        // Confirms zero is handled correctly
+        [TestMethod]
+        public void ParseQuantityInput_ZeroValue_ShouldCreateQuantity()
+        {
+            string input = "0";
+
+            Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result!.Value);
+        }
+
+        // Static comparison with same unit and equal values
+        [TestMethod]
+        public void AreQuantitiesEqual_Static_SameUnitSameValue_ShouldReturnTrue()
+        {
+            bool result = QuantityMeasurementService.AreQuantitiesEqual(
+                1.0, LengthUnit.FEET,
+                1.0, LengthUnit.FEET
+            );
+
+            Assert.IsTrue(result);
+        }
+
+        // Static comparison with same unit and different values
+        [TestMethod]
+        public void AreQuantitiesEqual_Static_SameUnitDifferentValue_ShouldReturnFalse()
+        {
+            bool result = QuantityMeasurementService.AreQuantitiesEqual(
+                1.0, LengthUnit.FEET,
+                2.0, LengthUnit.FEET
+            );
+
+            Assert.IsFalse(result);
+        }
+
+        // Static comparison with equivalent cross-unit values
+        [TestMethod]
+        public void AreQuantitiesEqual_Static_CrossUnitMatch_ShouldReturnTrue()
+        {
+            bool result = QuantityMeasurementService.AreQuantitiesEqual(
+                1.0, LengthUnit.FEET,
+                12.0, LengthUnit.INCH
+            );
+
+            Assert.IsTrue(result);
+        }
+
+        // Static comparison with non-matching cross-unit values
+        [TestMethod]
+        public void AreQuantitiesEqual_Static_CrossUnitMismatch_ShouldReturnFalse()
+        {
+            bool result = QuantityMeasurementService.AreQuantitiesEqual(
+                1.0, LengthUnit.FEET,
+                13.0, LengthUnit.INCH
+            );
 
             Assert.IsFalse(result);
         }
 
         #endregion
 
-        #region Inch Related Tests
+        #region Legacy Feet Tests
 
+        // Validates equality comparison for Feet objects
         [TestMethod]
-        public void CompareInch_WhenSameValuesProvided_ShouldReturnTrue()
+        public void CompareFeetEquality_IdenticalValues_ShouldReturnTrue()
         {
-            Inch first = new Inch(1.0);
-            Inch second = new Inch(1.0);
+            var f1 = new Feet(1.0);
+            var f2 = new Feet(1.0);
 
-            bool isEqual = _quantityService.CompareInchEquality(first, second);
-
-            Assert.IsTrue(isEqual);
-        }
-
-        [TestMethod]
-        public void CompareInch_WhenDifferentValuesProvided_ShouldReturnFalse()
-        {
-            Inch first = new Inch(1.0);
-            Inch second = new Inch(2.0);
-
-            bool isEqual = _quantityService.CompareInchEquality(first, second);
-
-            Assert.IsFalse(isEqual);
-        }
-
-        [TestMethod]
-        public void CompareInch_WhenFirstValueIsNull_ShouldReturnFalse()
-        {
-            Inch? first = null;
-            Inch second = new Inch(1.0);
-
-            bool isEqual = _quantityService.CompareInchEquality(first, second);
-
-            Assert.IsFalse(isEqual);
-        }
-
-        [TestMethod]
-        public void CompareInch_WhenSecondValueIsNull_ShouldReturnFalse()
-        {
-            Inch first = new Inch(1.0);
-            Inch? second = null;
-
-            bool isEqual = _quantityService.CompareInchEquality(first, second);
-
-            Assert.IsFalse(isEqual);
-        }
-
-        [TestMethod]
-        public void CompareInch_WhenBothValuesAreNull_ShouldReturnFalse()
-        {
-            Inch? first = null;
-            Inch? second = null;
-
-            bool isEqual = _quantityService.CompareInchEquality(first, second);
-
-            Assert.IsFalse(isEqual);
-        }
-
-        [TestMethod]
-        public void ConvertStringToInch_WhenValidNumberProvided_ShouldCreateInch()
-        {
-            string inputValue = "3.5";
-
-            Inch? inch = _quantityService.ParseInchInput(inputValue);
-
-            Assert.IsNotNull(inch);
-            Assert.AreEqual(3.5, inch!.Value, 0.0001);
-        }
-
-        [TestMethod]
-        public void ConvertStringToInch_WhenInputIsNull_ShouldReturnNull()
-        {
-            string? inputValue = null;
-
-            Inch? inch = _quantityService.ParseInchInput(inputValue);
-
-            Assert.IsNull(inch);
-        }
-
-        [TestMethod]
-        public void ConvertStringToInch_WhenInputIsEmpty_ShouldReturnNull()
-        {
-            string inputValue = "";
-
-            Inch? inch = _quantityService.ParseInchInput(inputValue);
-
-            Assert.IsNull(inch);
-        }
-
-        [TestMethod]
-        public void ConvertStringToInch_WhenInputIsSpaces_ShouldReturnNull()
-        {
-            string inputValue = "   ";
-
-            Inch? inch = _quantityService.ParseInchInput(inputValue);
-
-            Assert.IsNull(inch);
-        }
-
-        [TestMethod]
-        public void ConvertStringToInch_WhenInvalidTextProvided_ShouldReturnNull()
-        {
-            string inputValue = "abc";
-
-            Inch? inch = _quantityService.ParseInchInput(inputValue);
-
-            Assert.IsNull(inch);
-        }
-
-        [TestMethod]
-        public void ConvertStringToInch_WhenNegativeValueProvided_ShouldCreateInch()
-        {
-            string inputValue = "-2.5";
-
-            Inch? inch = _quantityService.ParseInchInput(inputValue);
-
-            Assert.IsNotNull(inch);
-            Assert.AreEqual(-2.5, inch!.Value, 0.0001);
-        }
-
-        [TestMethod]
-        public void ConvertStringToInch_WhenZeroProvided_ShouldCreateInch()
-        {
-            string inputValue = "0";
-
-            Inch? inch = _quantityService.ParseInchInput(inputValue);
-
-            Assert.IsNotNull(inch);
-            Assert.AreEqual(0, inch!.Value, 0.0001);
-        }
-
-        [TestMethod]
-        public void StaticInchComparison_WhenValuesMatch_ShouldReturnTrue()
-        {
-            bool result = QuantityMeasurementService.AreInchEqual(1.0, 1.0);
+            bool result = _service.CompareFeetEquality(f1, f2);
 
             Assert.IsTrue(result);
         }
 
+        // Confirms Feet parsing with valid input
         [TestMethod]
-        public void StaticInchComparison_WhenValuesDoNotMatch_ShouldReturnFalse()
+        public void ParseFeetInput_ValidNumber_ShouldCreateFeet()
         {
-            bool result = QuantityMeasurementService.AreInchEqual(1.0, 2.0);
+            string input = "3.5";
 
-            Assert.IsFalse(result);
+            Feet? result = _service.ParseFeetInput(input);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(3.5, result!.Value, 0.0001);
+        }
+
+        #endregion
+
+        #region Legacy Inch Tests
+
+        // Validates equality comparison for Inch objects
+        [TestMethod]
+        public void CompareInchEquality_IdenticalValues_ShouldReturnTrue()
+        {
+            var i1 = new Inch(1.0);
+            var i2 = new Inch(1.0);
+
+            bool result = _service.CompareInchEquality(i1, i2);
+
+            Assert.IsTrue(result);
+        }
+
+        // Confirms Inch parsing with valid input
+        [TestMethod]
+        public void ParseInchInput_ValidNumber_ShouldCreateInch()
+        {
+            string input = "3.5";
+
+            Inch? result = _service.ParseInchInput(input);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(3.5, result!.Value, 0.0001);
         }
 
         #endregion

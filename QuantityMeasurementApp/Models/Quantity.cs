@@ -3,77 +3,80 @@ using System;
 namespace QuantityMeasurementApp.Models
 {
     /// <summary>
-    /// Represents a measurable quantity consisting of a numeric value and a length unit
-    /// This generic model replaces multiple unit-specific classes
+    /// Generic Quantity class that represents any measurement with a value and unit
+    /// This eliminates code duplication from separate Feet and Inch classes
     /// </summary>
     public class Quantity
     {
-        // Stores the measurement amount
-        private readonly double _amount;
+        // Private fields for value and unit
+        private readonly double _value;
+        private readonly LengthUnit _unit;
 
-        // Stores the measurement unit
-        private readonly LengthUnit _lengthUnit;
-
-        // Initializes a Quantity instance with value and unit
-        // amount: numeric measurement
-        // lengthUnit: unit of measurement
-        public Quantity(double amount, LengthUnit lengthUnit)
+        // Constructor to initialize a new Quantity object with a value and unit
+        // Parameter: value - The measurement value
+        // Parameter: unit - The unit of measurement (from LengthUnit enum)
+        public Quantity(double value, LengthUnit unit)
         {
-            _amount = amount;
-            _lengthUnit = lengthUnit;
+            _value = value;
+            _unit = unit;
         }
 
-        // Returns the stored numeric value
-        public double Value => _amount;
+        // Public property to access the measurement value
+        public double Value => _value;
 
-        // Returns the unit associated with the value
-        public LengthUnit Unit => _lengthUnit;
+        // Public property to access the measurement unit
+        public LengthUnit Unit => _unit;
 
-        // Converts the quantity into feet (base unit)
-        private double ToFeet()
+        // Convert the current quantity to feet (base unit)
+        // Returns: The value converted to feet
+        private double ConvertToFeet()
         {
-            return _amount * _lengthUnit.GetConversionFactorToFeet();
+            return _value * _unit.ToFeetFactor();
         }
 
-        // Checks equality between two Quantity objects
-        // Comparison is done after converting both values to feet
+        // Determines whether the specified object is equal to the current Quantity object
+        // Compares quantities by converting both to a common base unit (feet)
+        // Parameter: obj - The object to compare with the current object
+        // Returns: true if the specified object is equal to the current object; otherwise, false
         public override bool Equals(object? obj)
         {
-            // Same reference implies equality
+            // Check if the object is the same reference (reflexive property)
             if (ReferenceEquals(this, obj))
                 return true;
 
-            // Null objects are never equal
-            if (obj == null)
+            // Check if the object is null
+            if (obj is null)
                 return false;
 
-            // Ensure both objects are of the same type
-            if (obj.GetType() != typeof(Quantity))
+            // Check if the object is of different type (type safety)
+            if (GetType() != obj.GetType())
                 return false;
 
-            // Cast after validation
-            Quantity otherQuantity = (Quantity)obj;
+            // Safe cast after type check
+            Quantity other = (Quantity)obj;
 
-            // Normalize both values to feet before comparison
-            double thisValueInFeet = ToFeet();
-            double otherValueInFeet = otherQuantity.ToFeet();
+            // Convert both quantities to feet for comparison
+            double thisInFeet = this.ConvertToFeet();
+            double otherInFeet = other.ConvertToFeet();
 
-            // Perform strict equality check
-            return thisValueInFeet == otherValueInFeet;
+            // Compare the converted values with a small tolerance for floating point precision
+            // Using exact equality for strict comparison
+            return thisInFeet == otherInFeet;
         }
 
-        // Generates hash code based on normalized (feet) value
-        // Ensures consistency with Equals()
+        // Serves as the default hash function
+        // Returns a hash code for the current object based on converted value
         public override int GetHashCode()
         {
-            return ToFeet().GetHashCode();
+            // Use the converted value to ensure consistent hash codes
+            return ConvertToFeet().GetHashCode();
         }
 
-        // Returns readable string format of quantity
-        // Example: "2.5 ft" or "30 in"
+        // Returns a string representation of the Quantity object
+        // Format: "{value} {unitSymbol}" (e.g., "1.5 ft" or "12 in")
         public override string ToString()
         {
-            return $"{_amount} {_lengthUnit.GetUnitSymbol()}";
+            return $"{_value} {_unit.Symbol()}";
         }
     }
 }

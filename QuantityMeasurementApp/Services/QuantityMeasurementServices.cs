@@ -3,83 +3,92 @@ using QuantityMeasurementApp.Models;
 namespace QuantityMeasurementApp.Services
 {
     /// <summary>
-    /// Provides measurement-related operations using the generic Quantity model
-    /// Supports comparison, parsing, and backward compatibility with older units
+    /// Handles all quantity-related comparison and parsing operations
+    /// Uses instance methods instead of static ones
     /// </summary>
     public class QuantityMeasurementService
     {
-        // Compares two Quantity objects after validation
-        // Returns false if any input is null
-        public bool CompareQuantityEquality(Quantity? first, Quantity? second)
+        // Checks whether two Quantity objects represent the same measurement
+        // Returns false if any of the objects is null
+        public bool CheckQuantityMatch(Quantity? first, Quantity? second)
         {
+            // If either quantity is missing, they cannot be equal
             if (first == null || second == null)
                 return false;
 
+            // Use Quantity class's equality logic
             return first.Equals(second);
         }
 
-        // Converts string input into a Quantity object for a given unit
-        // Returns null for invalid or empty input
-        public Quantity? ParseQuantityInput(string? rawInput, LengthUnit unit)
+        // Converts user input string into a Quantity object
+        // Returns null if input is invalid or empty
+        public Quantity? ConvertToQuantity(string? userInput, LengthUnit unitType)
         {
-            if (string.IsNullOrWhiteSpace(rawInput))
+            // Validate input
+            if (string.IsNullOrEmpty(userInput))
                 return null;
 
-            bool parsed = double.TryParse(rawInput, out double numericValue);
-            return parsed ? new Quantity(numericValue, unit) : null;
+            // Attempt to convert string to numeric value
+            if (double.TryParse(userInput, out double parsedValue))
+            {
+                return new Quantity(parsedValue, unitType);
+            }
+
+            // Input is not a valid number
+            return null;
         }
 
-        // Static helper to compare two values with their respective units
-        // Uses Quantity internally for normalization
-        public static bool AreQuantitiesEqual(
+        // Compares two values with their respective units
+        // Internally converts them into Quantity objects
+        public bool IsQuantityEqual(
             double firstValue,
             LengthUnit firstUnit,
             double secondValue,
             LengthUnit secondUnit
         )
         {
-            Quantity left = new Quantity(firstValue, firstUnit);
-            Quantity right = new Quantity(secondValue, secondUnit);
+            Quantity firstQuantity = new Quantity(firstValue, firstUnit);
+            Quantity secondQuantity = new Quantity(secondValue, secondUnit);
 
-            return left.Equals(right);
+            return firstQuantity.Equals(secondQuantity);
         }
 
-        // -------- Backward Compatibility (Feet) --------
-
-        public bool CompareFeetEquality(Feet? leftFeet, Feet? rightFeet)
+        // Legacy support for Feet comparison using Quantity
+        public bool MatchFeetValues(Feet? firstFeet, Feet? secondFeet)
         {
-            if (leftFeet == null || rightFeet == null)
+            if (firstFeet == null || secondFeet == null)
                 return false;
 
-            Quantity left = new Quantity(leftFeet.Value, LengthUnit.FEET);
-            Quantity right = new Quantity(rightFeet.Value, LengthUnit.FEET);
+            Quantity q1 = new Quantity(firstFeet.Value, LengthUnit.FEET);
+            Quantity q2 = new Quantity(secondFeet.Value, LengthUnit.FEET);
 
-            return left.Equals(right);
+            return q1.Equals(q2);
         }
 
-        public Feet? ParseFeetInput(string? input)
+        // Legacy support for parsing Feet input
+        public Feet? ConvertFeetInput(string? input)
         {
-            Quantity? parsed = ParseQuantityInput(input, LengthUnit.FEET);
-            return parsed == null ? null : new Feet(parsed.Value);
+            Quantity? quantity = ConvertToQuantity(input, LengthUnit.FEET);
+            return quantity == null ? null : new Feet(quantity.Value);
         }
 
-        // -------- Backward Compatibility (Inch) --------
-
-        public bool CompareInchEquality(Inch? leftInch, Inch? rightInch)
+        // Legacy support for Inch comparison using Quantity
+        public bool MatchInchValues(Inch? firstInch, Inch? secondInch)
         {
-            if (leftInch == null || rightInch == null)
+            if (firstInch == null || secondInch == null)
                 return false;
 
-            Quantity left = new Quantity(leftInch.Value, LengthUnit.INCH);
-            Quantity right = new Quantity(rightInch.Value, LengthUnit.INCH);
+            Quantity q1 = new Quantity(firstInch.Value, LengthUnit.INCH);
+            Quantity q2 = new Quantity(secondInch.Value, LengthUnit.INCH);
 
-            return left.Equals(right);
+            return q1.Equals(q2);
         }
 
-        public Inch? ParseInchInput(string? input)
+        // Legacy support for parsing Inch input
+        public Inch? ConvertInchInput(string? input)
         {
-            Quantity? parsed = ParseQuantityInput(input, LengthUnit.INCH);
-            return parsed == null ? null : new Inch(parsed.Value);
+            Quantity? quantity = ConvertToQuantity(input, LengthUnit.INCH);
+            return quantity == null ? null : new Inch(quantity.Value);
         }
     }
 }

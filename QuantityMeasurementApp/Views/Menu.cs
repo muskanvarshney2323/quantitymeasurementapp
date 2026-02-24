@@ -4,233 +4,256 @@ using QuantityMeasurementApp.Services;
 
 namespace QuantityMeasurementApp.Views
 {
-    // This class handles all console-based interactions with the user
-    // Refactored to work with the generic Quantity implementation
+    // Handles all console-based interaction with the user
+    // Includes support for Feet, Inches, Yards, and Centimeters
     public class Menu
     {
-        // Service layer object for performing calculations and comparisons
+        // Business logic layer
         private readonly QuantityMeasurementService _service;
 
-        // Default constructor initializes service dependency
+        // Utility helper for unit conversions
+        private readonly LengthUnitExtensions _unitHelper;
+
+        // Initialize required services
         public Menu()
         {
             _service = new QuantityMeasurementService();
+            _unitHelper = new LengthUnitExtensions();
         }
 
-        // Displays menu options and controls application flow
+        // Entry point for displaying the menu system
         public void Display()
         {
-            Console.WriteLine("=== Welcome to Quantity Measurement System ===");
-            Console.WriteLine("UC3: Generic Quantity Implementation using DRY Concept\n");
+            Console.WriteLine("=== Quantity Measurement System ===");
+            Console.WriteLine("Extended Version: Yards & Centimeters Included\n");
 
-            // Demonstrating static comparison methods
-            DisplayStaticComparisons();
+            DisplayPredefinedExamples();
 
             while (true)
             {
-                ShowMenuOptions();
-                string? userChoice = Console.ReadLine();
+                PrintMainOptions();
 
-                if (userChoice == "4" || userChoice?.ToLower() == "exit")
+                string? input = Console.ReadLine();
+
+                if (input == "5" || input?.ToLower() == "exit")
                     break;
 
-                HandleUserChoice(userChoice);
+                HandleMainSelection(input);
             }
 
-            Console.WriteLine("\nApplication closed. Have a great day!");
+            Console.WriteLine("\nApplication closed. Goodbye!");
         }
 
-        // Shows predefined comparison examples including unit conversion
-        private void DisplayStaticComparisons()
+        // Shows predefined equality examples for demonstration
+        private void DisplayPredefinedExamples()
         {
-            Console.WriteLine("--- Sample Static Comparisons ---");
-            Console.WriteLine(
-                $"Feet vs Feet: 1.0 ft & 1.0 ft => {QuantityMeasurementService.AreQuantitiesEqual(1.0, LengthUnit.FEET, 1.0, LengthUnit.FEET)}"
-            );
-            Console.WriteLine(
-                $"Feet vs Feet: 1.0 ft & 2.0 ft => {QuantityMeasurementService.AreQuantitiesEqual(1.0, LengthUnit.FEET, 2.0, LengthUnit.FEET)}"
-            );
-            Console.WriteLine(
-                $"Inch vs Inch: 1.0 in & 1.0 in => {QuantityMeasurementService.AreQuantitiesEqual(1.0, LengthUnit.INCH, 1.0, LengthUnit.INCH)}"
-            );
-            Console.WriteLine(
-                $"Inch vs Inch: 1.0 in & 2.0 in => {QuantityMeasurementService.AreQuantitiesEqual(1.0, LengthUnit.INCH, 2.0, LengthUnit.INCH)}"
-            );
-            Console.WriteLine(
-                $"Feet vs Inch: 1.0 ft & 12.0 in => {QuantityMeasurementService.AreQuantitiesEqual(1.0, LengthUnit.FEET, 12.0, LengthUnit.INCH)}"
-            );
-            Console.WriteLine(
-                $"Inch vs Feet: 12.0 in & 1.0 ft => {QuantityMeasurementService.AreQuantitiesEqual(12.0, LengthUnit.INCH, 1.0, LengthUnit.FEET)}\n"
-            );
+            Console.WriteLine("--- Sample Comparisons ---");
+
+            Console.WriteLine($"1 ft vs 1 ft → {_service.IsQuantityEqual(1, LengthUnit.FEET, 1, LengthUnit.FEET)}");
+            Console.WriteLine($"1 in vs 1 in → {_service.IsQuantityEqual(1, LengthUnit.INCH, 1, LengthUnit.INCH)}");
+            Console.WriteLine($"1 yd vs 1 yd → {_service.IsQuantityEqual(1, LengthUnit.YARD, 1, LengthUnit.YARD)}");
+            Console.WriteLine($"1 cm vs 1 cm → {_service.IsQuantityEqual(1, LengthUnit.CENTIMETER, 1, LengthUnit.CENTIMETER)}");
+
+            Console.WriteLine("\n--- Mixed Unit Comparisons ---");
+
+            Console.WriteLine($"1 yd vs 3 ft → {_service.IsQuantityEqual(1, LengthUnit.YARD, 3, LengthUnit.FEET)}");
+            Console.WriteLine($"1 yd vs 36 in → {_service.IsQuantityEqual(1, LengthUnit.YARD, 36, LengthUnit.INCH)}");
+            Console.WriteLine($"30.48 cm vs 1 ft → {_service.IsQuantityEqual(30.48, LengthUnit.CENTIMETER, 1, LengthUnit.FEET)}");
+
+            Console.WriteLine("\n----------------------------------------\n");
         }
 
-        // Displays available options to the user
-        private void ShowMenuOptions()
+        // Prints available options
+        private void PrintMainOptions()
         {
             Console.WriteLine("Select an option:");
-            Console.WriteLine("1. Compare values with same unit");
-            Console.WriteLine("2. Compare values with different units");
-            Console.WriteLine("3. Use legacy Feet/Inch comparison");
-            Console.WriteLine("4. Exit program");
-            Console.Write("Your selection (1-4): ");
+            Console.WriteLine("1. Compare same units");
+            Console.WriteLine("2. Compare different units");
+            Console.WriteLine("3. Advanced unit demonstration");
+            Console.WriteLine("4. Original Feet/Inch comparison");
+            Console.WriteLine("5. Exit");
+            Console.Write("Choice (1-5): ");
         }
 
-        // Routes user input to appropriate screen
-        private void HandleUserChoice(string? choice)
+        // Handles main menu selection
+        private void HandleMainSelection(string? choice)
         {
             switch (choice)
             {
                 case "1":
-                    SameUnitComparison();
+                    SameUnitScreen();
                     break;
                 case "2":
-                    CrossUnitComparison();
+                    CrossUnitScreen();
                     break;
                 case "3":
-                    LegacyComparisonMenu();
+                    AdvancedScreen();
+                    break;
+                case "4":
+                    LegacyScreen();
                     break;
                 default:
-                    Console.WriteLine("Invalid option selected. Please try again.\n");
+                    Console.WriteLine("Invalid selection. Try again.\n");
                     break;
             }
         }
 
-        // Handles comparison where both values use the same unit
-        private void SameUnitComparison()
+        // Compare values using the same unit
+        private void SameUnitScreen()
         {
             Console.WriteLine("\n--- Same Unit Comparison ---");
-            Console.WriteLine("Choose measurement unit:");
-            Console.WriteLine("1. Feet");
-            Console.WriteLine("2. Inches");
-            Console.Write("Selection: ");
+            LengthUnit unit = AskForUnit();
 
-            string? unitChoice = Console.ReadLine();
-            LengthUnit unit = unitChoice == "1" ? LengthUnit.FEET : LengthUnit.INCH;
-            string unitLabel = unit == LengthUnit.FEET ? "feet" : "inches";
+            Console.WriteLine($"Enter first value in {LengthUnitExtensions.GetUnitName(unit)}:");
+            Quantity? q1 = _service.ConvertToQuantity(Console.ReadLine(), unit);
 
-            Console.WriteLine($"Enter first value in {unitLabel}:");
-            string? firstInput = Console.ReadLine();
+            Console.WriteLine($"Enter second value in {LengthUnitExtensions.GetUnitName(unit)}:");
+            Quantity? q2 = _service.ConvertToQuantity(Console.ReadLine(), unit);
 
-            Console.WriteLine($"Enter second value in {unitLabel}:");
-            string? secondInput = Console.ReadLine();
-
-            Quantity? q1 = _service.ParseQuantityInput(firstInput, unit);
-            Quantity? q2 = _service.ParseQuantityInput(secondInput, unit);
-
-            if (q1 == null || q2 == null)
+            if (q1 is null || q2 is null)
             {
-                DisplayError("Invalid data entered. Numbers only allowed.");
+                ShowError("Invalid numeric input.");
                 return;
             }
 
-            bool result = _service.CompareQuantityEquality(q1, q2);
-            DisplayResult(q1.ToString(), q2.ToString(), result);
+            bool result = _service.CheckQuantityMatch(q1, q2);
+            ShowResult(q1.ToString(), q2.ToString(), result);
         }
 
-        // Handles comparison between feet and inches
-        private void CrossUnitComparison()
+        // Compare two values with different units
+        private void CrossUnitScreen()
         {
             Console.WriteLine("\n--- Cross Unit Comparison ---");
 
-            Console.WriteLine("Provide value in feet:");
-            string? feetInput = Console.ReadLine();
+            Console.WriteLine("Select first unit:");
+            LengthUnit unit1 = AskForUnit();
 
-            Console.WriteLine("Provide value in inches:");
-            string? inchInput = Console.ReadLine();
+            Console.WriteLine("Select second unit:");
+            LengthUnit unit2 = AskForUnit();
 
-            Quantity? feetQty = _service.ParseQuantityInput(feetInput, LengthUnit.FEET);
-            Quantity? inchQty = _service.ParseQuantityInput(inchInput, LengthUnit.INCH);
+            Console.WriteLine($"Enter value in {LengthUnitExtensions.GetUnitName(unit1)}:");
+            Quantity? q1 = _service.ConvertToQuantity(Console.ReadLine(), unit1);
 
-            if (feetQty == null || inchQty == null)
+            Console.WriteLine($"Enter value in {LengthUnitExtensions.GetUnitName(unit2)}:");
+            Quantity? q2 = _service.ConvertToQuantity(Console.ReadLine(), unit2);
+
+            if (q1 is null || q2 is null)
             {
-                DisplayError("Invalid input detected. Please enter numeric values.");
+                ShowError("Invalid numeric input.");
                 return;
             }
 
-            bool result = _service.CompareQuantityEquality(feetQty, inchQty);
-            DisplayResult(feetQty.ToString(), inchQty.ToString(), result);
+            bool result = _service.CheckQuantityMatch(q1, q2);
+            ShowResult(q1.ToString(), q2.ToString(), result);
+
+            ExplainConversion(q1, q2);
         }
 
-        // Menu for legacy (old class-based) comparison
-        private void LegacyComparisonMenu()
+        // Demonstrates chained conversions
+        private void AdvancedScreen()
         {
-            Console.WriteLine("\n--- Legacy Measurement Comparison ---");
-            Console.WriteLine("1. Compare Feet values");
-            Console.WriteLine("2. Compare Inch values");
-            Console.Write("Selection: ");
+            Console.WriteLine("\n--- Advanced Demonstration ---");
 
-            string? option = Console.ReadLine();
+            Console.WriteLine("Example: 2 yd = 6 ft = 72 in");
+            Console.WriteLine($"2 yd vs 72 in → {_service.IsQuantityEqual(2, LengthUnit.YARD, 72, LengthUnit.INCH)}");
 
-            if (option == "1")
-                LegacyFeetComparison();
-            else if (option == "2")
-                LegacyInchComparison();
+            Console.WriteLine("\nExample: 30.48 cm = 1 ft");
+            Console.WriteLine($"30.48 cm vs 1 ft → {_service.IsQuantityEqual(30.48, LengthUnit.CENTIMETER, 1, LengthUnit.FEET)}");
+
+            Console.WriteLine("\n----------------------------------------\n");
+        }
+
+        // Old implementation support
+        private void LegacyScreen()
+        {
+            Console.WriteLine("\n--- Original Class Comparison ---");
+            Console.WriteLine("1. Feet");
+            Console.WriteLine("2. Inches");
+            Console.Write("Select option: ");
+
+            string? input = Console.ReadLine();
+
+            if (input == "1")
+                LegacyFeet();
+            else if (input == "2")
+                LegacyInch();
             else
-                Console.WriteLine("Invalid selection.\n");
+                Console.WriteLine("Invalid option.\n");
         }
 
-        // Legacy feet comparison
-        private void LegacyFeetComparison()
+        private void LegacyFeet()
         {
-            Console.WriteLine("\n--- Feet Comparison (Legacy) ---");
+            Feet? f1 = _service.ConvertFeetInput(GetInput("Enter first value in feet:"));
+            Feet? f2 = _service.ConvertFeetInput(GetInput("Enter second value in feet:"));
 
-            string? input1 = PromptInput("Enter first feet value:");
-            string? input2 = PromptInput("Enter second feet value:");
-
-            Feet? f1 = _service.ParseFeetInput(input1);
-            Feet? f2 = _service.ParseFeetInput(input2);
-
-            if (f1 == null || f2 == null)
+            if (f1 is null || f2 is null)
             {
-                DisplayError("Incorrect input format.");
+                ShowError("Invalid input.");
                 return;
             }
 
-            bool result = _service.CompareFeetEquality(f1, f2);
-            DisplayResult(f1.ToString(), f2.ToString(), result);
+            ShowResult(f1.ToString(), f2.ToString(), _service.MatchFeetValues(f1, f2));
         }
 
-        // Legacy inch comparison
-        private void LegacyInchComparison()
+        private void LegacyInch()
         {
-            Console.WriteLine("\n--- Inch Comparison (Legacy) ---");
+            Inch? i1 = _service.ConvertInchInput(GetInput("Enter first value in inches:"));
+            Inch? i2 = _service.ConvertInchInput(GetInput("Enter second value in inches:"));
 
-            string? input1 = PromptInput("Enter first inch value:");
-            string? input2 = PromptInput("Enter second inch value:");
-
-            Inch? i1 = _service.ParseInchInput(input1);
-            Inch? i2 = _service.ParseInchInput(input2);
-
-            if (i1 == null || i2 == null)
+            if (i1 is null || i2 is null)
             {
-                DisplayError("Invalid input provided.");
+                ShowError("Invalid input.");
                 return;
             }
 
-            bool result = _service.CompareInchEquality(i1, i2);
-            DisplayResult(i1.ToString(), i2.ToString(), result);
+            ShowResult(i1.ToString(), i2.ToString(), _service.MatchInchValues(i1, i2));
         }
 
-        // Displays prompt and reads user input
-        private string? PromptInput(string message)
+        // Ask user to select unit
+        private LengthUnit AskForUnit()
+        {
+            Console.WriteLine("1. Feet");
+            Console.WriteLine("2. Inches");
+            Console.WriteLine("3. Yards");
+            Console.WriteLine("4. Centimeters");
+            Console.Write("Choice: ");
+
+            return Console.ReadLine() switch
+            {
+                "1" => LengthUnit.FEET,
+                "2" => LengthUnit.INCH,
+                "3" => LengthUnit.YARD,
+                "4" => LengthUnit.CENTIMETER,
+                _ => LengthUnit.FEET
+            };
+        }
+
+        private void ExplainConversion(Quantity q1, Quantity q2)
+        {
+            double v1 = q1.Value * _unitHelper.GetConversionFactorToFeet(q1.Unit);
+            double v2 = q2.Value * _unitHelper.GetConversionFactorToFeet(q2.Unit);
+
+            Console.WriteLine("\n--- Conversion to Feet ---");
+            Console.WriteLine($"{q1} = {v1:F6} ft");
+            Console.WriteLine($"{q2} = {v2:F6} ft");
+            Console.WriteLine($"Difference = {Math.Abs(v1 - v2):F6} ft\n");
+        }
+
+        private string? GetInput(string message)
         {
             Console.WriteLine(message);
             return Console.ReadLine();
         }
 
-        // Shows comparison output
-        private void DisplayResult(string first, string second, bool equal)
+        private void ShowResult(string m1, string m2, bool equal)
         {
-            Console.WriteLine($"\nValue 1: {first}");
-            Console.WriteLine($"Value 2: {second}");
-            Console.WriteLine($"Comparison Result: {(equal ? "Equal" : "Not Equal")}\n");
-            Console.WriteLine("--------------------------------------\n");
+            Console.WriteLine($"\n{m1} vs {m2}");
+            Console.WriteLine(equal ? "Result: Equal\n" : "Result: Not Equal\n");
         }
 
-        // Prints error messages
-        private void DisplayError(string error)
+        private void ShowError(string message)
         {
-            Console.WriteLine($"{error}\n");
+            Console.WriteLine($"Error: {message}\n");
         }
     }
 }

@@ -3,84 +3,132 @@ using System;
 namespace QuantityMeasurementApp.Models
 {
     /// <summary>
-    /// A reusable Quantity class used to represent measurements 
-    /// with a numeric value and a length unit.
-    /// This approach avoids creating separate classes for each unit type.
+    /// Models a measurable length consisting of a numeric value
+    /// and its associated unit. Supports conversion and comparison.
     /// </summary>
     public class Quantity
     {
         // Stores the numeric measurement
         private readonly double _value;
 
-        // Stores the unit associated with the measurement
+        // Stores the unit of measurement
         private readonly LengthUnit _unit;
 
-        // Helper for unit conversion operations
-        private readonly LengthUnitExtensions _unitHelper;
+        // Handles unit conversion logic
+        private readonly UnitConverter _converter;
 
         /// <summary>
-        /// Initializes a new Quantity instance with the given value and unit.
+        /// Creates a new Quantity instance with the specified value and unit.
         /// </summary>
-        /// <param name="value">Numeric measurement</param>
-        /// <param name="unit">Unit type from LengthUnit enum</param>
+        /// <param name="value">Numeric measurement amount.</param>
+        /// <param name="unit">Measurement unit type.</param>
         public Quantity(double value, LengthUnit unit)
         {
             _value = value;
             _unit = unit;
-            _unitHelper = new LengthUnitExtensions();
+            _converter = new UnitConverter();
         }
 
-        // Exposes the stored value
+        /// <summary>
+        /// Returns the stored numeric value.
+        /// </summary>
         public double Value => _value;
 
-        // Exposes the stored unit
+        /// <summary>
+        /// Returns the associated unit.
+        /// </summary>
         public LengthUnit Unit => _unit;
 
         /// <summary>
-        /// Converts the current measurement into feet (standard comparison unit).
+        /// Converts this instance into another unit and
+        /// returns a new Quantity with the converted value.
         /// </summary>
-        private double ToFeet()
+        /// <param name="targetUnit">Desired unit for conversion.</param>
+        public Quantity ConvertTo(LengthUnit targetUnit)
         {
-            return _value * _unitHelper.GetConversionFactorToFeet(_unit);
+            ValidateUnit(targetUnit);
+
+            double valueInFeet = _value * _converter.GetConversionFactorToFeet(_unit);
+            double convertedValue =
+                valueInFeet / _converter.GetConversionFactorToFeet(targetUnit);
+
+            return new Quantity(convertedValue, targetUnit);
         }
 
         /// <summary>
-        /// Checks equality between this instance and another object.
-        /// Two quantities are considered equal if their values match 
-        /// after conversion to the same base unit (feet).
+        /// Converts a numeric value from one unit to another
+        /// without manually creating a Quantity object.
+        /// </summary>
+        public static double Convert(double value, LengthUnit sourceUnit, LengthUnit targetUnit)
+        {
+            ValidateValue(value);
+            ValidateUnit(sourceUnit);
+            ValidateUnit(targetUnit);
+
+            var original = new Quantity(value, sourceUnit);
+            var result = original.ConvertTo(targetUnit);
+
+            return result.Value;
+        }
+
+        /// <summary>
+        /// Determines whether another object represents
+        /// the same physical length as this instance.
         /// </summary>
         public override bool Equals(object? obj)
         {
             if (ReferenceEquals(this, obj))
                 return true;
 
-            if (obj is null || obj.GetType() != typeof(Quantity))
+            if (obj is not Quantity other)
                 return false;
 
-            Quantity other = (Quantity)obj;
+            double thisFeet = ConvertTo(LengthUnit.FEET).Value;
+            double otherFeet = other.ConvertTo(LengthUnit.FEET).Value;
 
-            double currentInFeet = this.ToFeet();
-            double otherInFeet = other.ToFeet();
-
-            return _unitHelper.AreApproximatelyEqual(currentInFeet, otherInFeet);
+            return _converter.AreApproximatelyEqual(thisFeet, otherFeet);
         }
 
         /// <summary>
-        /// Generates a hash code using the converted value (rounded 
-        /// to reduce floating-point precision inconsistencies).
+        /// Generates a hash code based on the value converted to feet.
+        /// Rounded to reduce floating-point inconsistencies.
         /// </summary>
         public override int GetHashCode()
         {
-            double baseValue = ToFeet();
+            double baseValue = ConvertTo(LengthUnit.FEET).Value;
             return Math.Round(baseValue, 6).GetHashCode();
         }
 
         /// <summary>
-        /// Returns a readable string like "2.5 ft" or "10 in".
+        /// Returns a readable representation such as "5 ft" or "10 cm".
         /// </summary>
         public override string ToString()
         {
             return $"{_value} {LengthUnitExtensions.GetUnitSymbol(_unit)}";
+        }
+
+        /// <summary>
+        /// Ensures that the provided unit exists in the LengthUnit enum.
+        /// </summary>
+        private static void ValidateUnit(LengthUnit unit)
+        {
+            if (!Enum.IsDefined(typeof(LengthUnit), unit))
+            {
+                throw new ArgumentException($"Unsupported unit: {unit}");
+            }
+        }
+
+        /// <summary>
+        /// Ensures the numeric value is finite (not NaN or Infinity).
+        /// </summary>
+        private static void ValidateValue(double value)
+        {
+            if (double.IsNaN(value) || double.IsInfinity(value))
+            {
+                throw new ArgumentException(
+                    $"Value must be a valid finite number. Received: {value}"
+                );
+            }
         }
     }
 }

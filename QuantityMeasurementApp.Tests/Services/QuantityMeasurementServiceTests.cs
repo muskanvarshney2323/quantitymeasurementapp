@@ -5,9 +5,9 @@ using QuantityMeasurementApp.Services;
 namespace QuantityMeasurementApp.Tests.Services
 {
     /// <summary>
-    /// Unit test suite for validating QuantityMeasurementService behavior.
-    /// Covers quantity comparison, input parsing, unit conversion checks,
-    /// static comparison helpers, and support for legacy Feet and Inch models.
+    /// Contains unit tests for QuantityMeasurementService validating
+    /// quantity comparison, parsing logic, static equality checks,
+    /// and backward compatibility methods for Feet and Inch.
     /// </summary>
     [TestClass]
     public class QuantityMeasurementServiceTests
@@ -15,280 +15,383 @@ namespace QuantityMeasurementApp.Tests.Services
         private QuantityMeasurementService _service = null!;
 
         [TestInitialize]
-        public void Init()
+        public void Setup()
         {
             _service = new QuantityMeasurementService();
         }
 
-        #region Generic Quantity Validation
+        #region Generic Quantity Tests
 
-        // Verifies equality when both quantities have same value and same unit
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) for equal same-unit values
         [TestMethod]
-        public void CompareQuantityEquality_SameUnitSameValue_ShouldReturnTrue()
+        public void CompareQuantityEquality_BothNonNullEqualValues_SameUnit_ReturnsTrue()
         {
             var q1 = new Quantity(1.0, LengthUnit.FEET);
             var q2 = new Quantity(1.0, LengthUnit.FEET);
-
             bool result = _service.CompareQuantityEquality(q1, q2);
-
             Assert.IsTrue(result);
         }
 
-        // Verifies inequality when quantities differ but unit remains same
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) for different same-unit values
         [TestMethod]
-        public void CompareQuantityEquality_SameUnitDifferentValue_ShouldReturnFalse()
+        public void CompareQuantityEquality_BothNonNullDifferentValues_SameUnit_ReturnsFalse()
         {
             var q1 = new Quantity(1.0, LengthUnit.FEET);
             var q2 = new Quantity(2.0, LengthUnit.FEET);
-
             bool result = _service.CompareQuantityEquality(q1, q2);
-
             Assert.IsFalse(result);
         }
 
-        // Ensures correct comparison for equivalent values across units
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) for equivalent cross-unit values
         [TestMethod]
-        public void CompareQuantityEquality_EquivalentCrossUnits_ShouldReturnTrue()
+        public void CompareQuantityEquality_CrossUnitEquivalentValues_ReturnsTrue()
         {
             var q1 = new Quantity(1.0, LengthUnit.FEET);
             var q2 = new Quantity(12.0, LengthUnit.INCH);
-
             bool result = _service.CompareQuantityEquality(q1, q2);
-
             Assert.IsTrue(result);
         }
 
-        // Ensures comparison fails for non-matching cross-unit values
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) for non-equivalent cross-unit values
         [TestMethod]
-        public void CompareQuantityEquality_NonEquivalentCrossUnits_ShouldReturnFalse()
+        public void CompareQuantityEquality_CrossUnitNonEquivalentValues_ReturnsFalse()
         {
             var q1 = new Quantity(1.0, LengthUnit.FEET);
             var q2 = new Quantity(13.0, LengthUnit.INCH);
-
             bool result = _service.CompareQuantityEquality(q1, q2);
-
             Assert.IsFalse(result);
         }
 
-        // Handles scenario when first quantity is null
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) when first parameter is null
         [TestMethod]
-        public void CompareQuantityEquality_FirstQuantityNull_ShouldReturnFalse()
+        public void CompareQuantityEquality_FirstParameterNull_ReturnsFalse()
         {
             Quantity? q1 = null;
             var q2 = new Quantity(1.0, LengthUnit.FEET);
-
             bool result = _service.CompareQuantityEquality(q1, q2);
-
             Assert.IsFalse(result);
         }
 
-        // Handles scenario when second quantity is null
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) when second parameter is null
         [TestMethod]
-        public void CompareQuantityEquality_SecondQuantityNull_ShouldReturnFalse()
+        public void CompareQuantityEquality_SecondParameterNull_ReturnsFalse()
         {
             var q1 = new Quantity(1.0, LengthUnit.FEET);
             Quantity? q2 = null;
-
             bool result = _service.CompareQuantityEquality(q1, q2);
-
             Assert.IsFalse(result);
         }
 
-        // Handles scenario when both quantities are null
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) when both parameters are null
         [TestMethod]
-        public void CompareQuantityEquality_BothQuantitiesNull_ShouldReturnFalse()
+        public void CompareQuantityEquality_BothParametersNull_ReturnsFalse()
         {
             Quantity? q1 = null;
             Quantity? q2 = null;
-
             bool result = _service.CompareQuantityEquality(q1, q2);
-
             Assert.IsFalse(result);
         }
 
-        // Confirms valid numeric input produces a Quantity object
+        // Tests QuantityMeasurementService.ParseQuantityInput(string, LengthUnit) with valid numeric string
         [TestMethod]
-        public void ParseQuantityInput_ValidNumber_ShouldCreateQuantity()
+        public void ParseQuantityInput_ValidNumericString_ReturnsQuantityObject()
         {
             string input = "3.5";
-
             Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
-
             Assert.IsNotNull(result);
             Assert.AreEqual(3.5, result!.Value);
             Assert.AreEqual(LengthUnit.FEET, result.Unit);
         }
 
-        // Ensures null input is safely rejected
+        // Tests QuantityMeasurementService.ParseQuantityInput(string, LengthUnit) with null input
         [TestMethod]
-        public void ParseQuantityInput_NullValue_ShouldReturnNull()
+        public void ParseQuantityInput_NullInput_ReturnsNull()
         {
             string? input = null;
-
             Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
-
             Assert.IsNull(result);
         }
 
-        // Ensures empty string input is rejected
+        // Tests QuantityMeasurementService.ParseQuantityInput(string, LengthUnit) with empty string
         [TestMethod]
-        public void ParseQuantityInput_EmptyText_ShouldReturnNull()
+        public void ParseQuantityInput_EmptyString_ReturnsNull()
         {
             string input = "";
-
             Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
-
             Assert.IsNull(result);
         }
 
-        // Ensures whitespace-only input is rejected
+        // Tests QuantityMeasurementService.ParseQuantityInput(string, LengthUnit) with whitespace input
         [TestMethod]
-        public void ParseQuantityInput_WhitespaceOnly_ShouldReturnNull()
+        public void ParseQuantityInput_Whitespace_ReturnsNull()
         {
             string input = "   ";
-
             Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
-
             Assert.IsNull(result);
         }
 
-        // Ensures non-numeric input is rejected
+        // Tests QuantityMeasurementService.ParseQuantityInput(string, LengthUnit) with non-numeric input
         [TestMethod]
-        public void ParseQuantityInput_InvalidText_ShouldReturnNull()
+        public void ParseQuantityInput_NonNumericString_ReturnsNull()
         {
             string input = "abc";
-
             Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
-
             Assert.IsNull(result);
         }
 
-        // Confirms negative numbers are allowed
+        // Tests QuantityMeasurementService.ParseQuantityInput(string, LengthUnit) with negative numeric input
         [TestMethod]
-        public void ParseQuantityInput_NegativeNumber_ShouldCreateQuantity()
+        public void ParseQuantityInput_NegativeNumber_ReturnsQuantityObject()
         {
             string input = "-2.5";
-
             Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
-
             Assert.IsNotNull(result);
             Assert.AreEqual(-2.5, result!.Value);
         }
 
-        // Confirms zero is handled correctly
+        // Tests QuantityMeasurementService.ParseQuantityInput(string, LengthUnit) with zero value
         [TestMethod]
-        public void ParseQuantityInput_ZeroValue_ShouldCreateQuantity()
+        public void ParseQuantityInput_Zero_ReturnsQuantityObject()
         {
             string input = "0";
-
             Quantity? result = _service.ParseQuantityInput(input, LengthUnit.FEET);
-
             Assert.IsNotNull(result);
             Assert.AreEqual(0, result!.Value);
         }
 
-        // Static comparison with same unit and equal values
+        // Tests static QuantityMeasurementService.AreQuantitiesEqual(double, LengthUnit, double, LengthUnit) for equal same-unit values
         [TestMethod]
-        public void AreQuantitiesEqual_Static_SameUnitSameValue_ShouldReturnTrue()
+        public void AreQuantitiesEqual_EqualValues_SameUnit_ReturnsTrue()
         {
-            bool result = QuantityMeasurementService.AreQuantitiesEqual(
-                1.0, LengthUnit.FEET,
-                1.0, LengthUnit.FEET
-            );
-
+            bool result = _service.AreQuantitiesEqual(1.0, LengthUnit.FEET, 1.0, LengthUnit.FEET);
             Assert.IsTrue(result);
         }
 
-        // Static comparison with same unit and different values
+        // Tests static QuantityMeasurementService.AreQuantitiesEqual(double, LengthUnit, double, LengthUnit) for different same-unit values
         [TestMethod]
-        public void AreQuantitiesEqual_Static_SameUnitDifferentValue_ShouldReturnFalse()
+        public void AreQuantitiesEqual_DifferentValues_SameUnit_ReturnsFalse()
         {
-            bool result = QuantityMeasurementService.AreQuantitiesEqual(
-                1.0, LengthUnit.FEET,
-                2.0, LengthUnit.FEET
-            );
-
+            bool result = _service.AreQuantitiesEqual(1.0, LengthUnit.FEET, 2.0, LengthUnit.FEET);
             Assert.IsFalse(result);
         }
 
-        // Static comparison with equivalent cross-unit values
+        // Tests static QuantityMeasurementService.AreQuantitiesEqual(double, LengthUnit, double, LengthUnit) for equivalent cross-unit values
         [TestMethod]
-        public void AreQuantitiesEqual_Static_CrossUnitMatch_ShouldReturnTrue()
+        public void AreQuantitiesEqual_CrossUnitEquivalentValues_ReturnsTrue()
         {
-            bool result = QuantityMeasurementService.AreQuantitiesEqual(
-                1.0, LengthUnit.FEET,
-                12.0, LengthUnit.INCH
-            );
-
+            bool result = _service.AreQuantitiesEqual(1.0, LengthUnit.FEET, 12.0, LengthUnit.INCH);
             Assert.IsTrue(result);
         }
 
-        // Static comparison with non-matching cross-unit values
+        // Tests static QuantityMeasurementService.AreQuantitiesEqual(double, LengthUnit, double, LengthUnit) for non-equivalent cross-unit values
         [TestMethod]
-        public void AreQuantitiesEqual_Static_CrossUnitMismatch_ShouldReturnFalse()
+        public void AreQuantitiesEqual_CrossUnitNonEquivalentValues_ReturnsFalse()
         {
-            bool result = QuantityMeasurementService.AreQuantitiesEqual(
-                1.0, LengthUnit.FEET,
-                13.0, LengthUnit.INCH
-            );
-
+            bool result = _service.AreQuantitiesEqual(1.0, LengthUnit.FEET, 13.0, LengthUnit.INCH);
             Assert.IsFalse(result);
         }
 
         #endregion
 
-        #region Legacy Feet Tests
+        #region Backward Compatibility Tests (Feet)
 
-        // Validates equality comparison for Feet objects
+        // Tests QuantityMeasurementService.CompareFeetEquality(Feet, Feet)
         [TestMethod]
-        public void CompareFeetEquality_IdenticalValues_ShouldReturnTrue()
+        public void CompareFeetEquality_BothNonNullEqualValues_ReturnsTrue()
         {
-            var f1 = new Feet(1.0);
-            var f2 = new Feet(1.0);
-
-            bool result = _service.CompareFeetEquality(f1, f2);
-
+            var feet1 = new Feet(1.0);
+            var feet2 = new Feet(1.0);
+            bool result = _service.CompareFeetEquality(feet1, feet2);
             Assert.IsTrue(result);
         }
 
-        // Confirms Feet parsing with valid input
+        // Tests QuantityMeasurementService.ParseFeetInput(string)
         [TestMethod]
-        public void ParseFeetInput_ValidNumber_ShouldCreateFeet()
+        public void ParseFeetInput_ValidNumericString_ReturnsFeetObject()
         {
             string input = "3.5";
-
             Feet? result = _service.ParseFeetInput(input);
-
             Assert.IsNotNull(result);
             Assert.AreEqual(3.5, result!.Value, 0.0001);
         }
 
         #endregion
 
-        #region Legacy Inch Tests
+        #region Backward Compatibility Tests (Inch)
 
-        // Validates equality comparison for Inch objects
+        // Tests QuantityMeasurementService.CompareInchEquality(Inch, Inch)
         [TestMethod]
-        public void CompareInchEquality_IdenticalValues_ShouldReturnTrue()
+        public void CompareInchEquality_BothNonNullEqualValues_ReturnsTrue()
         {
-            var i1 = new Inch(1.0);
-            var i2 = new Inch(1.0);
-
-            bool result = _service.CompareInchEquality(i1, i2);
-
+            var inch1 = new Inch(1.0);
+            var inch2 = new Inch(1.0);
+            bool result = _service.CompareInchEquality(inch1, inch2);
             Assert.IsTrue(result);
         }
 
-        // Confirms Inch parsing with valid input
+        // Tests QuantityMeasurementService.ParseInchInput(string)
         [TestMethod]
-        public void ParseInchInput_ValidNumber_ShouldCreateInch()
+        public void ParseInchInput_ValidNumericString_ReturnsInchObject()
         {
             string input = "3.5";
-
             Inch? result = _service.ParseInchInput(input);
-
             Assert.IsNotNull(result);
             Assert.AreEqual(3.5, result!.Value, 0.0001);
+        }
+
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) for Yard same-unit values
+        [TestMethod]
+        public void CompareQuantityEquality_YardToYardEqualValues_ReturnsTrue()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.YARD);
+            var q2 = new Quantity(1.0, LengthUnit.YARD);
+            bool result = _service.CompareQuantityEquality(q1, q2);
+            Assert.IsTrue(result);
+        }
+
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) for Yard to Feet equivalent values
+        [TestMethod]
+        public void CompareQuantityEquality_YardToFeetEquivalentValues_ReturnsTrue()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.YARD);
+            var q2 = new Quantity(3.0, LengthUnit.FEET);
+            bool result = _service.CompareQuantityEquality(q1, q2);
+            Assert.IsTrue(result);
+        }
+
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) for Yard to Inches equivalent values
+        [TestMethod]
+        public void CompareQuantityEquality_YardToInchesEquivalentValues_ReturnsTrue()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.YARD);
+            var q2 = new Quantity(36.0, LengthUnit.INCH);
+            bool result = _service.CompareQuantityEquality(q1, q2);
+            Assert.IsTrue(result);
+        }
+
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) for Centimeter same-unit values
+        [TestMethod]
+        public void CompareQuantityEquality_CentimeterToCentimeterEqualValues_ReturnsTrue()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.CENTIMETER);
+            var q2 = new Quantity(1.0, LengthUnit.CENTIMETER);
+            bool result = _service.CompareQuantityEquality(q1, q2);
+            Assert.IsTrue(result);
+        }
+
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) for Centimeter to Inches equivalent values
+        [TestMethod]
+        public void CompareQuantityEquality_CentimeterToInchesEquivalentValues_ReturnsTrue()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.CENTIMETER);
+            var q2 = new Quantity(0.393700787, LengthUnit.INCH);
+            bool result = _service.CompareQuantityEquality(q1, q2);
+            Assert.IsTrue(result);
+        }
+
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) for Centimeter to Feet equivalent values
+        [TestMethod]
+        public void CompareQuantityEquality_CentimeterToFeetEquivalentValues_ReturnsTrue()
+        {
+            var q1 = new Quantity(30.48, LengthUnit.CENTIMETER);
+            var q2 = new Quantity(1.0, LengthUnit.FEET);
+            bool result = _service.CompareQuantityEquality(q1, q2);
+            Assert.IsTrue(result);
+        }
+
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) for Centimeter to Yard equivalent values
+        [TestMethod]
+        public void CompareQuantityEquality_CentimeterToYardEquivalentValues_ReturnsTrue()
+        {
+            var q1 = new Quantity(91.44, LengthUnit.CENTIMETER);
+            var q2 = new Quantity(1.0, LengthUnit.YARD);
+            bool result = _service.CompareQuantityEquality(q1, q2);
+            Assert.IsTrue(result);
+        }
+
+        // Tests static QuantityMeasurementService.AreQuantitiesEqual(double, LengthUnit, double, LengthUnit) for Yard to Feet equivalent values
+        [TestMethod]
+        public void AreQuantitiesEqual_YardToFeetEquivalentValues_ReturnsTrue()
+        {
+            bool result = _service.AreQuantitiesEqual(1.0, LengthUnit.YARD, 3.0, LengthUnit.FEET);
+            Assert.IsTrue(result);
+        }
+
+        // Tests static QuantityMeasurementService.AreQuantitiesEqual(double, LengthUnit, double, LengthUnit) for Yard to Inches equivalent values
+        [TestMethod]
+        public void AreQuantitiesEqual_YardToInchesEquivalentValues_ReturnsTrue()
+        {
+            bool result = _service.AreQuantitiesEqual(1.0, LengthUnit.YARD, 36.0, LengthUnit.INCH);
+            Assert.IsTrue(result);
+        }
+
+        // Tests static QuantityMeasurementService.AreQuantitiesEqual(double, LengthUnit, double, LengthUnit) for Centimeter to Inches equivalent values
+        [TestMethod]
+        public void AreQuantitiesEqual_CentimeterToInchesEquivalentValues_ReturnsTrue()
+        {
+            bool result = _service.AreQuantitiesEqual(
+                1.0,
+                LengthUnit.CENTIMETER,
+                0.393700787,
+                LengthUnit.INCH
+            );
+            Assert.IsTrue(result, "Static method: 1 cm should equal 0.393700787 inches");
+        }
+
+        // Tests static QuantityMeasurementService.AreQuantitiesEqual(double, LengthUnit, double, LengthUnit) for Centimeter to Feet equivalent values
+        [TestMethod]
+        public void AreQuantitiesEqual_CentimeterToFeetEquivalentValues_ReturnsTrue()
+        {
+            bool result = _service.AreQuantitiesEqual(
+                30.48,
+                LengthUnit.CENTIMETER,
+                1.0,
+                LengthUnit.FEET
+            );
+            Assert.IsTrue(result);
+        }
+
+        // Tests static QuantityMeasurementService.AreQuantitiesEqual(double, LengthUnit, double, LengthUnit) for Centimeter to Yard equivalent values
+        [TestMethod]
+        public void AreQuantitiesEqual_CentimeterToYardEquivalentValues_ReturnsTrue()
+        {
+            bool result = _service.AreQuantitiesEqual(
+                91.44,
+                LengthUnit.CENTIMETER,
+                1.0,
+                LengthUnit.YARD
+            );
+            Assert.IsTrue(result);
+        }
+
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) with rounded precision values
+        [TestMethod]
+        public void CompareQuantityEquality_CentimeterToInches_RoundedValues_ReturnsTrue()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.CENTIMETER);
+            var q2 = new Quantity(0.393701, LengthUnit.INCH);
+            bool result = _service.CompareQuantityEquality(q1, q2);
+            Assert.IsTrue(result, "1 cm should approximately equal 0.393701 inches");
+        }
+
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) precision for Centimeter to Feet
+        [TestMethod]
+        public void CompareQuantityEquality_CentimeterToFeet_PrecisionTest()
+        {
+            var q1 = new Quantity(30.48, LengthUnit.CENTIMETER);
+            var q2 = new Quantity(1.0, LengthUnit.FEET);
+            bool result = _service.CompareQuantityEquality(q1, q2);
+            Assert.IsTrue(result, "30.48 cm should exactly equal 1 foot");
+        }
+
+        // Tests QuantityMeasurementService.CompareQuantityEquality(Quantity, Quantity) precision for Centimeter to Yard
+        [TestMethod]
+        public void CompareQuantityEquality_CentimeterToYard_PrecisionTest()
+        {
+            var q1 = new Quantity(91.44, LengthUnit.CENTIMETER);
+            var q2 = new Quantity(1.0, LengthUnit.YARD);
+            bool result = _service.CompareQuantityEquality(q1, q2);
+            Assert.IsTrue(result, "91.44 cm should exactly equal 1 yard");
         }
 
         #endregion

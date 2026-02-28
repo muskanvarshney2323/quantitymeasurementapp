@@ -72,6 +72,63 @@ namespace QuantityMeasurementApp.Models
         }
 
         /// <summary>
+        /// Adds another Quantity to this instance and returns the result
+        /// in this instance's unit.
+        /// </summary>
+        /// <param name="other">The Quantity to add.</param>
+        /// <returns>A new Quantity representing the sum in this instance's unit.</returns>
+        public Quantity Add(Quantity other)
+        {
+            if (other == null)
+                throw new ArgumentNullException(nameof(other));
+
+            // Convert both to feet, add, then convert back to this unit
+            double thisInFeet = ConvertTo(LengthUnit.FEET).Value;
+            double otherInFeet = other.ConvertTo(LengthUnit.FEET).Value;
+            double sumInFeet = thisInFeet + otherInFeet;
+
+            return new Quantity(sumInFeet, LengthUnit.FEET).ConvertTo(_unit);
+        }
+
+        /// <summary>
+        /// Adds another Quantity to this instance and returns the result in the specified unit.
+        /// </summary>
+        /// <param name="other">The Quantity to add.</param>
+        /// <param name="resultUnit">The unit for the result.</param>
+        /// <returns>A new Quantity representing the sum in the specified unit.</returns>
+        public Quantity Add(Quantity other, LengthUnit resultUnit)
+        {
+            if (other == null)
+                throw new ArgumentNullException(nameof(other));
+
+            ValidateUnit(resultUnit);
+
+            // Convert both to feet, add, then convert to result unit
+            double thisInFeet = ConvertTo(LengthUnit.FEET).Value;
+            double otherInFeet = other.ConvertTo(LengthUnit.FEET).Value;
+            double sumInFeet = thisInFeet + otherInFeet;
+
+            return new Quantity(sumInFeet, LengthUnit.FEET).ConvertTo(resultUnit);
+        }
+
+        /// <summary>
+        /// Adds two quantities and returns the result in the specified unit.
+        /// </summary>
+        /// <param name="first">The first Quantity.</param>
+        /// <param name="second">The second Quantity.</param>
+        /// <param name="resultUnit">The unit for the result.</param>
+        /// <returns>A new Quantity representing the sum in the specified unit.</returns>
+        public static Quantity Add(Quantity first, Quantity second, LengthUnit resultUnit)
+        {
+            if (first == null)
+                throw new ArgumentNullException(nameof(first));
+            if (second == null)
+                throw new ArgumentNullException(nameof(second));
+
+            return first.Add(second, resultUnit);
+        }
+
+        /// <summary>
         /// Determines whether another object represents
         /// the same physical length as this instance.
         /// </summary>

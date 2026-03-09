@@ -1,4 +1,7 @@
 using QuantityMeasurementApp.Models;
+using DomainQuantities = QuantityMeasurementApp.Domain.Quantities;
+using DomainUnits = QuantityMeasurementApp.Domain.Units;
+using DomainValueObjects = QuantityMeasurementApp.Domain.ValueObjects;
 
 namespace QuantityMeasurementApp.Services
 {
@@ -95,6 +98,71 @@ namespace QuantityMeasurementApp.Services
         {
             Quantity? q = ParseQuantityInput(input, LengthUnit.INCH);
             return q != null ? new Inch(q.Value) : null;
+        }
+
+        // Compatibility methods expected by older tests / external callers
+        public bool AreQuantitiesEqual(DomainQuantities.Quantity first, DomainQuantities.Quantity second)
+        {
+            if (first is null || second is null) return false;
+            var m1 = new Quantity(first.Value, (Models.LengthUnit)first.Unit);
+            var m2 = new Quantity(second.Value, (Models.LengthUnit)second.Unit);
+            return m1.Equals(m2);
+        }
+
+        public double ConvertValue(double value, DomainUnits.LengthUnit source, DomainUnits.LengthUnit target)
+        {
+            return Quantity.Convert(value, (Models.LengthUnit)source, (Models.LengthUnit)target);
+        }
+
+        public DomainQuantities.Quantity AddQuantities(DomainQuantities.Quantity first, DomainQuantities.Quantity second)
+        {
+            var m1 = new Quantity(first.Value, (Models.LengthUnit)first.Unit);
+            var m2 = new Quantity(second.Value, (Models.LengthUnit)second.Unit);
+            var sum = m1.Add(m2);
+            return new DomainQuantities.Quantity(sum);
+        }
+
+        public DomainQuantities.Quantity AddQuantitiesWithTarget(DomainQuantities.Quantity first, DomainQuantities.Quantity second, DomainUnits.LengthUnit target)
+        {
+            var m1 = new Quantity(first.Value, (Models.LengthUnit)first.Unit);
+            var m2 = new Quantity(second.Value, (Models.LengthUnit)second.Unit);
+            var sum = m1.Add(m2, (Models.LengthUnit)target);
+            return new DomainQuantities.Quantity(sum);
+        }
+
+        public DomainQuantities.Quantity? CreateQuantityFromString(string? input, DomainUnits.LengthUnit unit)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return null;
+            if (double.TryParse(input, out double v))
+            {
+                var m = new Quantity(v, (Models.LengthUnit)unit);
+                return new DomainQuantities.Quantity(m);
+            }
+            return null;
+        }
+
+        public DomainValueObjects.Feet? CreateFeetFromString(string? input)
+        {
+            var q = ParseQuantityInput(input, LengthUnit.FEET);
+            return q != null ? new DomainValueObjects.Feet(q.Value) : null;
+        }
+
+        public DomainValueObjects.Inch? CreateInchFromString(string? input)
+        {
+            var q = ParseQuantityInput(input, LengthUnit.INCH);
+            return q != null ? new DomainValueObjects.Inch(q.Value) : null;
+        }
+
+        public bool AreFeetEqual(DomainValueObjects.Feet? f1, DomainValueObjects.Feet? f2)
+        {
+            if (f1 is null || f2 is null) return false;
+            return f1.Value == f2.Value;
+        }
+
+        public bool AreInchesEqual(DomainValueObjects.Inch? i1, DomainValueObjects.Inch? i2)
+        {
+            if (i1 is null || i2 is null) return false;
+            return i1.Value == i2.Value;
         }
     }
 }

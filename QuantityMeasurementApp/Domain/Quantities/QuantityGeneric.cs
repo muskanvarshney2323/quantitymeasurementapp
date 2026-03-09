@@ -51,6 +51,58 @@ namespace QuantityMeasurementApp.Domain.Quantities
             return new QuantityGeneric<U>(resultInTarget, targetUnit);
         }
 
+        /// <summary>
+        /// Subtracts another quantity from this quantity and returns the result in this quantity's unit.
+        /// </summary>
+        public QuantityGeneric<U> Subtract(QuantityGeneric<U> other)
+        {
+            if (other is null) throw new ArgumentNullException(nameof(other));
+
+            double baseThis = _unit.ToBaseUnit(_value);
+            double baseOther = other._unit.ToBaseUnit(other._value);
+
+            double baseResult = baseThis - baseOther;
+
+            double resultInThisUnit = _unit.FromBaseUnit(baseResult);
+            double rounded = Math.Round(resultInThisUnit, 2);
+            return new QuantityGeneric<U>(rounded, _unit);
+        }
+
+        /// <summary>
+        /// Subtracts another quantity from this quantity and returns the result expressed in the specified target unit.
+        /// </summary>
+        public QuantityGeneric<U> Subtract(QuantityGeneric<U> other, U targetUnit)
+        {
+            if (other is null) throw new ArgumentNullException(nameof(other));
+
+            double baseThis = _unit.ToBaseUnit(_value);
+            double baseOther = other._unit.ToBaseUnit(other._value);
+
+            double baseResult = baseThis - baseOther;
+
+            double resultInTarget = targetUnit.FromBaseUnit(baseResult);
+            double rounded = Math.Round(resultInTarget, 2);
+            return new QuantityGeneric<U>(rounded, targetUnit);
+        }
+
+        /// <summary>
+        /// Divides this quantity by another quantity and returns a dimensionless scalar ratio.
+        /// </summary>
+        public double Divide(QuantityGeneric<U> other)
+        {
+            if (other is null) throw new ArgumentNullException(nameof(other));
+
+            double baseThis = _unit.ToBaseUnit(_value);
+            double baseOther = other._unit.ToBaseUnit(other._value);
+
+            if (double.IsNaN(baseThis) || double.IsInfinity(baseThis) || double.IsNaN(baseOther) || double.IsInfinity(baseOther))
+                throw new ArgumentException("Values must be finite numbers.");
+
+            if (Math.Abs(baseOther) < Tolerance) throw new ArithmeticException("Division by zero quantity is not allowed.");
+
+            return baseThis / baseOther;
+        }
+
         public override bool Equals(object? obj)
         {
             if (ReferenceEquals(this, obj)) return true;

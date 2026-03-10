@@ -37,61 +37,72 @@ namespace QuantityMeasurementApp.Domain.Quantities
 
         public QuantityGeneric<U> Add(QuantityGeneric<U> other)
         {
-            if (other is null) throw new ArgumentNullException(nameof(other));
-            double sumInBase = _unit.ToBaseUnit(_value) + other._unit.ToBaseUnit(other._value);
-            double resultInThisUnit = _unit.FromBaseUnit(sumInBase);
-            return new QuantityGeneric<U>(resultInThisUnit, _unit);
+            double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.ADD);
+            double resultInThisUnit = _unit.FromBaseUnit(baseResult);
+            double rounded = RoundToTwoDecimals(resultInThisUnit);
+            return new QuantityGeneric<U>(rounded, _unit);
         }
 
         public QuantityGeneric<U> Add(QuantityGeneric<U> other, U targetUnit)
         {
-            if (other is null) throw new ArgumentNullException(nameof(other));
-            double sumInBase = _unit.ToBaseUnit(_value) + other._unit.ToBaseUnit(other._value);
-            double resultInTarget = targetUnit.FromBaseUnit(sumInBase);
-            return new QuantityGeneric<U>(resultInTarget, targetUnit);
+            double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.ADD);
+            double resultInTarget = targetUnit.FromBaseUnit(baseResult);
+            double rounded = RoundToTwoDecimals(resultInTarget);
+            return new QuantityGeneric<U>(rounded, targetUnit);
         }
 
         public QuantityGeneric<U> Subtract(QuantityGeneric<U> other)
         {
-            if (other is null) throw new ArgumentNullException(nameof(other));
-
-            double baseThis = _unit.ToBaseUnit(_value);
-            double baseOther = other._unit.ToBaseUnit(other._value);
-
-            double baseResult = baseThis - baseOther;
-
+            double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
             double resultInThisUnit = _unit.FromBaseUnit(baseResult);
-            double rounded = Math.Round(resultInThisUnit, 2);
+            double rounded = RoundToTwoDecimals(resultInThisUnit);
             return new QuantityGeneric<U>(rounded, _unit);
         }
 
         public QuantityGeneric<U> Subtract(QuantityGeneric<U> other, U targetUnit)
         {
-            if (other is null) throw new ArgumentNullException(nameof(other));
-
-            double baseThis = _unit.ToBaseUnit(_value);
-            double baseOther = other._unit.ToBaseUnit(other._value);
-
-            double baseResult = baseThis - baseOther;
-
+            double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
             double resultInTarget = targetUnit.FromBaseUnit(baseResult);
-            double rounded = Math.Round(resultInTarget, 2);
+            double rounded = RoundToTwoDecimals(resultInTarget);
             return new QuantityGeneric<U>(rounded, targetUnit);
         }
 
         public double Divide(QuantityGeneric<U> other)
         {
+            return PerformBaseArithmetic(other, ArithmeticOperation.DIVIDE);
+        }
+
+        private static double RoundToTwoDecimals(double value) => Math.Round(value, 2);
+
+        private enum ArithmeticOperation
+        {
+            ADD,
+            SUBTRACT,
+            DIVIDE
+        }
+
+        private double PerformBaseArithmetic(QuantityGeneric<U> other, ArithmeticOperation operation)
+        {
             if (other is null) throw new ArgumentNullException(nameof(other));
+
+            if (double.IsNaN(_value) || double.IsInfinity(_value) || double.IsNaN(other._value) || double.IsInfinity(other._value))
+                throw new ArgumentException("Values must be finite numbers.");
 
             double baseThis = _unit.ToBaseUnit(_value);
             double baseOther = other._unit.ToBaseUnit(other._value);
 
-            if (double.IsNaN(baseThis) || double.IsInfinity(baseThis) || double.IsNaN(baseOther) || double.IsInfinity(baseOther))
-                throw new ArgumentException("Values must be finite numbers.");
-
-            if (Math.Abs(baseOther) < Tolerance) throw new ArithmeticException("Division by zero quantity is not allowed.");
-
-            return baseThis / baseOther;
+            switch (operation)
+            {
+                case ArithmeticOperation.ADD:
+                    return baseThis + baseOther;
+                case ArithmeticOperation.SUBTRACT:
+                    return baseThis - baseOther;
+                case ArithmeticOperation.DIVIDE:
+                    if (Math.Abs(baseOther) < Tolerance) throw new ArithmeticException("Division by zero quantity is not allowed.");
+                    return baseThis / baseOther;
+                default:
+                    throw new InvalidOperationException("Unsupported arithmetic operation.");
+            }
         }
 
         public override bool Equals(object? obj)

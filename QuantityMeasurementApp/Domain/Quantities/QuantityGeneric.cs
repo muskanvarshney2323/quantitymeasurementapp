@@ -51,9 +51,6 @@ namespace QuantityMeasurementApp.Domain.Quantities
             return new QuantityGeneric<U>(resultInTarget, targetUnit);
         }
 
-        /// <summary>
-        /// Subtracts another quantity from this quantity and returns the result in this quantity's unit.
-        /// </summary>
         public QuantityGeneric<U> Subtract(QuantityGeneric<U> other)
         {
             if (other is null) throw new ArgumentNullException(nameof(other));
@@ -68,9 +65,6 @@ namespace QuantityMeasurementApp.Domain.Quantities
             return new QuantityGeneric<U>(rounded, _unit);
         }
 
-        /// <summary>
-        /// Subtracts another quantity from this quantity and returns the result expressed in the specified target unit.
-        /// </summary>
         public QuantityGeneric<U> Subtract(QuantityGeneric<U> other, U targetUnit)
         {
             if (other is null) throw new ArgumentNullException(nameof(other));
@@ -85,9 +79,6 @@ namespace QuantityMeasurementApp.Domain.Quantities
             return new QuantityGeneric<U>(rounded, targetUnit);
         }
 
-        /// <summary>
-        /// Divides this quantity by another quantity and returns a dimensionless scalar ratio.
-        /// </summary>
         public double Divide(QuantityGeneric<U> other)
         {
             if (other is null) throw new ArgumentNullException(nameof(other));

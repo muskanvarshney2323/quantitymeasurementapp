@@ -13,5 +13,12 @@ namespace QuantityMeasurementApp.Domain.Units
         double FromBaseUnit(double baseValue);
         string GetUnitName();
         string GetSymbol();
+        
+        // Default method to validate whether an arithmetic operation is supported by the unit.
+        // Implementations can override to throw if an operation is not supported (e.g. temperature).
+        void ValidateOperationSupport(string operation) { }
+
+        // Query whether a named operation is supported. Default: true for backward compatibility.
+        bool SupportsOperation(string operation) => true;
     }
 }

@@ -88,6 +88,16 @@ namespace QuantityMeasurementApp.Domain.Quantities
             if (double.IsNaN(_value) || double.IsInfinity(_value) || double.IsNaN(other._value) || double.IsInfinity(other._value))
                 throw new ArgumentException("Values must be finite numbers.");
 
+            // Validate that this unit supports the requested operation (units may opt-out, e.g., temperature)
+            try
+            {
+                _unit.ValidateOperationSupport(operation.ToString());
+            }
+            catch (NotSupportedException ex)
+            {
+                throw new NotSupportedException(ex.Message, ex);
+            }
+
             double baseThis = _unit.ToBaseUnit(_value);
             double baseOther = other._unit.ToBaseUnit(other._value);
 

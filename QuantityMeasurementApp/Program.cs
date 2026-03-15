@@ -3,64 +3,48 @@ using QuantityMeasurementApp.Services;
 
 namespace QuantityMeasurementApp
 {
-    // Program class acts as the starting point of the application
-    // Responsible for handling console-based user interaction
     class Program
     {
-        // Application execution begins from here
         static void Main(string[] args)
         {
-            // Print application title and use case info
-            Console.WriteLine("=== Quantity Measurement Application ===");
-            Console.WriteLine("UC1: Feet Measurement Equality\n");
+            Console.WriteLine("===== Quantity Measurement Console =====");
+            Console.WriteLine("Feet Equality Checker\n");
 
-            // Instantiate service class for measurement operations
-            var service = new QuantityMeasurementService();
+            QuantityMeasurementService measurementService = new QuantityMeasurementService();
 
-            // Loop runs continuously until user chooses to exit
             while (true)
             {
-                // Ask user to enter the first feet value
-                Console.WriteLine("Enter first measurement in feet (or 'exit' to quit):");
-                string? input1 = Console.ReadLine();
+                Console.Write("Enter first feet value (type exit to stop): ");
+                string? firstInput = Console.ReadLine();
 
-                // Exit condition check
-                if (input1?.ToLower() == "exit")
+                if (firstInput?.Trim().ToLower() == "exit")
                     break;
 
-                // Ask user to enter the second feet value
-                Console.WriteLine("Enter second measurement in feet:");
-                string? input2 = Console.ReadLine();
+                Console.Write("Enter second feet value: ");
+                string? secondInput = Console.ReadLine();
 
-                // Exit condition check
-                if (input2?.ToLower() == "exit")
+                if (secondInput?.Trim().ToLower() == "exit")
                     break;
 
-                // Convert string inputs into Feet objects
-                Feet? feet1 = service.ParseFeetInput(input1);
-                Feet? feet2 = service.ParseFeetInput(input2);
+                Feet? firstFeet = measurementService.ParseFeetInput(firstInput);
+                Feet? secondFeet = measurementService.ParseFeetInput(secondInput);
 
-                // Ensure both inputs are valid numbers
-                if (feet1 is null || feet2 is null)
+                if (firstFeet == null || secondFeet == null)
                 {
-                    Console.WriteLine("Invalid input! Please enter valid numeric values.\n");
-                    continue; // Restart loop for fresh input
+                    Console.WriteLine("Invalid input detected. Please try again.\n");
+                    continue;
                 }
 
-                // Perform equality comparison
-                bool areEqual = service.CompareFeetEquality(feet1, feet2);
+                bool result = measurementService.CompareFeetEquality(firstFeet, secondFeet);
 
-                // Show comparison outcome
-                Console.WriteLine($"\nFirst measurement: {feet1}");
-                Console.WriteLine($"Second measurement: {feet2}");
-                Console.WriteLine(
-                    $"Are they equal? {areEqual} ({(areEqual ? "Equal" : "Not Equal")})\n"
-                );
-                Console.WriteLine("----------------------------------------\n");
+                Console.WriteLine("\nResult Summary");
+                Console.WriteLine("-------------------------");
+                Console.WriteLine($"First Value  : {firstFeet}");
+                Console.WriteLine($"Second Value : {secondFeet}");
+                Console.WriteLine($"Equality     : {(result ? "Equal" : "Not Equal")}\n");
             }
 
-            // Message displayed when application terminates
-            Console.WriteLine("Thank you for using Quantity Measurement Application!");
+            Console.WriteLine("Application Closed.");
         }
     }
 }

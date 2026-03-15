@@ -2,62 +2,48 @@ using System;
 
 namespace QuantityMeasurementApp.Models
 {
-    // This class models a measurement expressed in feet
-    // It follows immutability, meaning its value cannot be modified after creation
+    // Represents a length measured in feet
     public class Feet
     {
-        // Stores the measurement internally
-        // Declared as readonly to prevent reassignment
-        private readonly double _value;
+        // Internal storage of the measurement
+        private readonly double _feetValue;
 
-        // Initializes the Feet object with a specific measurement
-        // value: measurement in feet
+        // Constructor
         public Feet(double value)
         {
-            _value = value;
+            _feetValue = value;
         }
 
-        // Exposes the measurement value in a read-only manner
-        public double Value => _value;
+        // Public read-only property
+        public double Value
+        {
+            get { return _feetValue; }
+        }
 
-        // Compares the current instance with another object for equality
-        // Equality is based on the stored measurement value
-        // obj: object to be compared
+        // Equality comparison
         public override bool Equals(object? obj)
         {
-            // If both references point to the same object, they are equal
+            if (obj is not Feet otherFeet)
+                return false;
+
             if (ReferenceEquals(this, obj))
                 return true;
 
-            // If the compared object is null, equality fails
-            if (obj is null)
-                return false;
+            double difference = Math.Abs(_feetValue - otherFeet._feetValue);
 
-            // Ensure both objects belong to the same class
-            if (GetType() != obj.GetType())
-                return false;
-
-            // Cast is safe after type validation
-            Feet other = (Feet)obj;
-
-            // Direct comparison of measurement values
-            // Exact comparison is required for precise validation
-            return _value == other._value;
+            return difference < 0.0001;
         }
 
-        // Generates a hash code for the object
-        // Objects with identical values must return identical hash codes
+        // Hash generation
         public override int GetHashCode()
         {
-            // Utilize the hash code implementation of double
-            return _value.GetHashCode();
+            return HashCode.Combine(_feetValue);
         }
 
-        // Converts the object into a readable string format
-        // Example output: "2 ft"
+        // Readable output
         public override string ToString()
         {
-            return $"{_value} ft";
+            return $"{_feetValue} ft";
         }
     }
 }

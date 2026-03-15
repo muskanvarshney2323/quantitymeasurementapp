@@ -2,44 +2,35 @@ using QuantityMeasurementApp.Models;
 
 namespace QuantityMeasurementApp.Services
 {
-    // Service layer responsible for measurement-related operations
-    // Contains business logic for comparing and parsing quantities
+    // Handles operations related to quantity measurements
     public class QuantityMeasurementService
     {
-        // Checks whether two Feet objects represent the same value
-        // feet1: first measurement (may be null)
-        // feet2: second measurement (may be null)
-        // Returns true only when both are non-null and equal
-        public bool CompareFeetEquality(Feet? feet1, Feet? feet2)
+        // Compare two measurements
+        public bool CompareFeetEquality(Feet? firstMeasurement, Feet? secondMeasurement)
         {
-            // If any of the inputs is null, comparison is not valid
-            if (feet1 is null || feet2 is null)
+            if (firstMeasurement == null)
                 return false;
 
-            // Use the Equals method defined inside the Feet class
-            // This keeps equality logic centralized and consistent
-            return feet1.Equals(feet2);
+            if (secondMeasurement == null)
+                return false;
+
+            return firstMeasurement.Equals(secondMeasurement);
         }
 
-        // Converts a string input into a Feet object
-        // input: textual value provided by user (can be null or empty)
-        // Returns a Feet instance if conversion succeeds, otherwise null
-        public Feet? ParseFeetInput(string? input)
+        // Convert user input string to Feet object
+        public Feet? ParseFeetInput(string? userInput)
         {
-            // Reject null, empty, or space-only strings
-            if (string.IsNullOrWhiteSpace(input))
+            if (string.IsNullOrWhiteSpace(userInput))
                 return null;
 
-            // Attempt to convert the string into a numeric value
-            // TryParse avoids exceptions for invalid inputs
-            if (double.TryParse(input, out double value))
-            {
-                // On successful conversion, return a new Feet object
-                return new Feet(value);
-            }
+            bool isValid = double.TryParse(userInput, out double parsedValue);
 
-            // If conversion fails, indicate invalid input
-            return null;
+            if (!isValid)
+                return null;
+
+            Feet result = new Feet(parsedValue);
+
+            return result;
         }
     }
 }

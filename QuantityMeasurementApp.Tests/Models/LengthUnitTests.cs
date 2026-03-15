@@ -5,52 +5,56 @@ using QuantityMeasurementApp.Models;
 namespace QuantityMeasurementApp.Tests.Models
 {
     /// <summary>
-    /// Contains unit tests for the LengthUnit enum and its extension methods.
-    /// Validates that GetConversionFactorToFeet() and GetUnitSymbol() work correctly.
+    /// Unit tests for LengthUnit enum and its extension methods.
+    /// Ensures correct conversion factors, symbols, and exception handling for invalid enums.
     /// </summary>
     [TestClass]
     public class LengthUnitTests
     {
-        // Ensures FEET unit returns correct conversion factor (1.0)
         [TestMethod]
-        public void GetConversionFactorToFeet_ForFeet_ShouldReturnOne()
+        public void ToFeetFactor_ForFeet_ShouldReturnOne()
         {
-            double factor = LengthUnit.FEET.GetConversionFactorToFeet();
+            double factor = LengthUnit.FEET.ToFeetFactor();
             Assert.AreEqual(1.0, factor, 0.0001);
         }
 
-        // Ensures INCH unit returns correct conversion factor (1/12)
         [TestMethod]
-        public void GetConversionFactorToFeet_ForInch_ShouldReturnOneTwelfth()
+        public void ToFeetFactor_ForInch_ShouldReturnOneTwelfth()
         {
-            double factor = LengthUnit.INCH.GetConversionFactorToFeet();
+            double factor = LengthUnit.INCH.ToFeetFactor();
             Assert.AreEqual(1.0 / 12.0, factor, 0.0001);
         }
 
-        // Verifies that FEET unit symbol is correctly returned
         [TestMethod]
-        public void GetUnitSymbol_ForFeet_ShouldReturnFt()
+        public void Symbol_ForFeet_ShouldReturnFt()
         {
-            string symbol = LengthUnit.FEET.GetUnitSymbol();
+            string symbol = LengthUnit.FEET.Symbol();
             Assert.AreEqual("ft", symbol);
         }
 
-        // Verifies that INCH unit symbol is correctly returned
         [TestMethod]
-        public void GetUnitSymbol_ForInch_ShouldReturnIn()
+        public void Symbol_ForInch_ShouldReturnIn()
         {
-            string symbol = LengthUnit.INCH.GetUnitSymbol();
+            string symbol = LengthUnit.INCH.Symbol();
             Assert.AreEqual("in", symbol);
         }
 
-        // Confirms that using an invalid enum value throws an exception
         [TestMethod]
-        public void GetConversionFactorToFeet_InvalidEnum_ShouldThrowException()
+        public void ToFeetFactor_InvalidEnum_ShouldThrowArgumentException()
         {
-            LengthUnit invalidUnit = (LengthUnit)99;
-            Assert.ThrowsException<ArgumentException>(() =>
-                invalidUnit.GetConversionFactorToFeet()
-            );
+            LengthUnit invalid = (LengthUnit)99;
+            bool exceptionThrown = false;
+
+            try
+            {
+                invalid.ToFeetFactor();
+            }
+            catch (ArgumentException)
+            {
+                exceptionThrown = true;
+            }
+
+            Assert.IsTrue(exceptionThrown, "Expected ArgumentException was not thrown.");
         }
     }
 }

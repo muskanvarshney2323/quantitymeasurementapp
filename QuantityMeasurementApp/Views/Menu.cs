@@ -16,7 +16,7 @@ namespace QuantityMeasurementApp.Views
         public void Display()
         {
             Console.WriteLine("=== Quantity Measurement Application ===");
-            Console.WriteLine("UC1 & UC2: Feet and Inch Equality Check\n");
+            Console.WriteLine("Feet, Inch and Quantity Equality Check\n");
 
             ShowStaticExamples();
 
@@ -25,7 +25,7 @@ namespace QuantityMeasurementApp.Views
                 ShowOptions();
                 string? choice = Console.ReadLine();
 
-                if (choice == "3" || choice?.ToLower() == "exit")
+                if (choice == "4" || choice?.ToLower() == "exit")
                     break;
 
                 ProcessChoice(choice);
@@ -47,7 +47,10 @@ namespace QuantityMeasurementApp.Views
                 $"Inch: 1.0 in vs 1.0 in -> Equal? {QuantityMeasurementService.AreInchEqual(1.0, 1.0)}"
             );
             Console.WriteLine(
-                $"Inch: 1.0 in vs 2.0 in -> Equal? {QuantityMeasurementService.AreInchEqual(1.0, 2.0)}\n"
+                $"Inch: 1.0 in vs 2.0 in -> Equal? {QuantityMeasurementService.AreInchEqual(1.0, 2.0)}"
+            );
+            Console.WriteLine(
+                $"Quantity: 1.0 ft vs 12.0 in -> Equal? {_service.AreQuantitiesEqual(1.0, LengthUnit.FEET, 12.0, LengthUnit.INCH)}\n"
             );
         }
 
@@ -56,7 +59,8 @@ namespace QuantityMeasurementApp.Views
             Console.WriteLine("Choose an option:");
             Console.WriteLine("1. Compare Feet");
             Console.WriteLine("2. Compare Inches");
-            Console.WriteLine("3. Exit");
+            Console.WriteLine("3. Compare Quantities");
+            Console.WriteLine("4. Exit");
             Console.Write("Enter your choice: ");
         }
 
@@ -70,6 +74,10 @@ namespace QuantityMeasurementApp.Views
 
                 case "2":
                     CompareInches();
+                    break;
+
+                case "3":
+                    CompareQuantities();
                     break;
 
                 default:
@@ -122,6 +130,46 @@ namespace QuantityMeasurementApp.Views
             Console.WriteLine($"\nFirst  : {firstInch}");
             Console.WriteLine($"Second : {secondInch}");
             Console.WriteLine($"Result : {(result ? "Equal" : "Not Equal")}\n");
+        }
+
+        private void CompareQuantities()
+        {
+            Console.WriteLine("\n--- Quantity Comparison ---");
+
+            string? firstValueInput = ReadInput("Enter first value: ");
+            LengthUnit firstUnit = ReadUnit("Select first unit (FEET / INCH / YARD / CENTIMETER): ");
+
+            string? secondValueInput = ReadInput("Enter second value: ");
+            LengthUnit secondUnit = ReadUnit("Select second unit (FEET / INCH / YARD / CENTIMETER): ");
+
+            Quantity? firstQuantity = _service.ParseQuantityInput(firstValueInput, firstUnit);
+            Quantity? secondQuantity = _service.ParseQuantityInput(secondValueInput, secondUnit);
+
+            if (firstQuantity == null || secondQuantity == null)
+            {
+                Console.WriteLine("Invalid numeric input.\n");
+                return;
+            }
+
+            bool result = _service.CompareQuantityEquality(firstQuantity, secondQuantity);
+
+            Console.WriteLine($"\nFirst  : {firstQuantity}");
+            Console.WriteLine($"Second : {secondQuantity}");
+            Console.WriteLine($"Result : {(result ? "Equal" : "Not Equal")}\n");
+        }
+
+        private LengthUnit ReadUnit(string message)
+        {
+            while (true)
+            {
+                Console.Write(message);
+                string? input = Console.ReadLine();
+
+                if (Enum.TryParse(input, true, out LengthUnit unit))
+                    return unit;
+
+                Console.WriteLine("Invalid unit. Please enter FEET, INCH, YARD, or CENTIMETER.");
+            }
         }
 
         private string? ReadInput(string message)

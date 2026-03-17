@@ -1,183 +1,177 @@
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuantityMeasurementApp.Enums;
 using QuantityMeasurementApp.Models;
 
 namespace QuantityMeasurementApp.Tests.Models
 {
-    /// <summary>
-    /// Unit tests for Quantity class.
-    /// Validates equality, hash code consistency, unit conversions (feet ↔ inches),
-    /// object comparison rules (reflexive, symmetric, transitive, consistent),
-    /// type and null safety, floating-point precision, and string formatting.
-    /// </summary>
     [TestClass]
-    public class QuantityTests
+    public class LengthUnitTests
     {
-        // Check equality for identical units and values
+        private const double Tolerance = 0.000001;
+
         [TestMethod]
-        public void Equals_SameUnitAndValue_ShouldBeTrue()
+        public void ToFeetFactor_FeetUnit_ReturnsOne()
         {
-            var q1 = new Quantity(1.0, LengthUnit.FEET);
-            var q2 = new Quantity(1.0, LengthUnit.FEET);
-            Assert.IsTrue(q1.Equals(q2), "1.0 ft must equal 1.0 ft");
+            double factor = LengthUnit.FEET.ToFeetFactor();
+            Assert.AreEqual(1.0, factor, Tolerance);
         }
 
-        // Check inequality for identical units but different values
         [TestMethod]
-        public void Equals_SameUnitDifferentValue_ShouldBeFalse()
+        public void ToFeetFactor_InchUnit_ReturnsOneTwelfth()
         {
-            var q1 = new Quantity(1.0, LengthUnit.FEET);
-            var q2 = new Quantity(2.0, LengthUnit.FEET);
-            Assert.IsFalse(q1.Equals(q2), "1.0 ft should not equal 2.0 ft");
+            double factor = LengthUnit.INCH.ToFeetFactor();
+            Assert.AreEqual(1.0 / 12.0, factor, Tolerance);
         }
 
-        // Check equality for inch values that are the same
         [TestMethod]
-        public void Equals_SameInchValue_ShouldBeTrue()
+        public void ToFeetFactor_YardUnit_ReturnsThree()
         {
-            var q1 = new Quantity(1.0, LengthUnit.INCH);
-            var q2 = new Quantity(1.0, LengthUnit.INCH);
-            Assert.IsTrue(q1.Equals(q2), "1.0 in must equal 1.0 in");
+            double factor = LengthUnit.YARD.ToFeetFactor();
+            Assert.AreEqual(3.0, factor, Tolerance);
         }
 
-        // Check inequality for inch values that differ
         [TestMethod]
-        public void Equals_DifferentInchValue_ShouldBeFalse()
+        public void ToFeetFactor_CentimeterUnit_ReturnsCorrectValue()
         {
-            var q1 = new Quantity(1.0, LengthUnit.INCH);
-            var q2 = new Quantity(2.0, LengthUnit.INCH);
-            Assert.IsFalse(q1.Equals(q2), "1.0 in should not equal 2.0 in");
+            double factor = LengthUnit.CENTIMETER.ToFeetFactor();
+            Assert.AreEqual(1.0 / 30.48, factor, Tolerance);
         }
 
-        // Check cross-unit equality (1 ft = 12 in)
         [TestMethod]
-        public void Equals_FeetAndInchEquivalent_ShouldBeTrue()
+        public void ConvertToBaseUnit_Feet_ReturnsSameValue()
         {
-            var q1 = new Quantity(1.0, LengthUnit.FEET);
-            var q2 = new Quantity(12.0, LengthUnit.INCH);
-            Assert.IsTrue(q1.Equals(q2), "1.0 ft should equal 12.0 in");
+            double result = LengthUnit.FEET.ConvertToBaseUnit(5.0);
+            Assert.AreEqual(5.0, result, Tolerance);
         }
 
-        // Symmetry: inch ↔ feet equivalence
         [TestMethod]
-        public void Equals_InchAndFeetSymmetry_ShouldBeTrue()
+        public void ConvertToBaseUnit_Inch_ReturnsFeetValue()
         {
-            var q1 = new Quantity(12.0, LengthUnit.INCH);
-            var q2 = new Quantity(1.0, LengthUnit.FEET);
-            Assert.IsTrue(q1.Equals(q2), "12.0 in should equal 1.0 ft");
+            double result = LengthUnit.INCH.ConvertToBaseUnit(12.0);
+            Assert.AreEqual(1.0, result, Tolerance);
         }
 
-        // Non-equivalent cross-unit comparison
         [TestMethod]
-        public void Equals_FeetAndInchNotEquivalent_ShouldBeFalse()
+        public void ConvertToBaseUnit_Yard_ReturnsFeetValue()
         {
-            var q1 = new Quantity(1.0, LengthUnit.FEET);
-            var q2 = new Quantity(13.0, LengthUnit.INCH);
-            Assert.IsFalse(q1.Equals(q2), "1.0 ft should not equal 13.0 in");
+            double result = LengthUnit.YARD.ConvertToBaseUnit(1.0);
+            Assert.AreEqual(3.0, result, Tolerance);
         }
 
-        // Reflexive check: object equals itself
         [TestMethod]
-        public void Equals_ReflexiveProperty_ShouldBeTrue()
+        public void ConvertToBaseUnit_Centimeter_ReturnsFeetValue()
         {
-            var q = new Quantity(1.0, LengthUnit.FEET);
-            Assert.IsTrue(q.Equals(q), "Object must equal itself");
+            double result = LengthUnit.CENTIMETER.ConvertToBaseUnit(30.48);
+            Assert.AreEqual(1.0, result, Tolerance);
         }
 
-        // Null comparison: object should not equal null
         [TestMethod]
-        public void Equals_NullCheck_ShouldBeFalse()
+        public void ConvertFromBaseUnit_Feet_ReturnsSameValue()
         {
-            var q = new Quantity(1.0, LengthUnit.FEET);
-            Assert.IsFalse(q.Equals(null), "Object must not equal null");
+            double result = LengthUnit.FEET.ConvertFromBaseUnit(2.0);
+            Assert.AreEqual(2.0, result, Tolerance);
         }
 
-        // Symmetric property test
         [TestMethod]
-        public void Equals_SymmetricRule_ShouldBeTrue()
+        public void ConvertFromBaseUnit_Inch_ReturnsInchValue()
         {
-            var q1 = new Quantity(1.5, LengthUnit.FEET);
-            var q2 = new Quantity(1.5, LengthUnit.FEET);
-            Assert.IsTrue(q1.Equals(q2) && q2.Equals(q1), "Equality should be symmetric");
+            double result = LengthUnit.INCH.ConvertFromBaseUnit(1.0);
+            Assert.AreEqual(12.0, result, Tolerance);
         }
 
-        // Transitive property test
         [TestMethod]
-        public void Equals_TransitiveRule_ShouldBeTrue()
+        public void ConvertFromBaseUnit_Yard_ReturnsYardValue()
         {
-            var qA = new Quantity(2.5, LengthUnit.FEET);
-            var qB = new Quantity(2.5, LengthUnit.FEET);
-            var qC = new Quantity(2.5, LengthUnit.FEET);
-            Assert.IsTrue(qA.Equals(qB) && qB.Equals(qC) && qA.Equals(qC), "Equality should be transitive");
+            double result = LengthUnit.YARD.ConvertFromBaseUnit(3.0);
+            Assert.AreEqual(1.0, result, Tolerance);
         }
 
-        // Objects of different types should not be equal
         [TestMethod]
-        public void Equals_DifferentTypeObject_ShouldBeFalse()
+        public void ConvertFromBaseUnit_Centimeter_ReturnsCentimeterValue()
         {
-            var q = new Quantity(1.0, LengthUnit.FEET);
-            var obj = new object();
-            Assert.IsFalse(q.Equals(obj), "Quantity must not equal a different type");
+            double result = LengthUnit.CENTIMETER.ConvertFromBaseUnit(1.0);
+            Assert.AreEqual(30.48, result, Tolerance);
         }
 
-        // Consistent equality across multiple calls
         [TestMethod]
-        public void Equals_ConsistencyCheck_ShouldBeTrue()
+        public void GetSymbol_FeetUnit_ReturnsFt()
         {
-            var q1 = new Quantity(3.0, LengthUnit.FEET);
-            var q2 = new Quantity(3.0, LengthUnit.FEET);
-            Assert.IsTrue(q1.Equals(q2) && q1.Equals(q2) && q1.Equals(q2), "Equality results should be consistent");
+            string symbol = LengthUnit.FEET.GetSymbol();
+            Assert.AreEqual("ft", symbol);
         }
 
-        // Test floating point precision handling
         [TestMethod]
-        public void Equals_FloatingPointPrecision_ShouldBeFalseForTinyDifference()
+        public void GetSymbol_InchUnit_ReturnsIn()
         {
-            var q1 = new Quantity(1.000001, LengthUnit.FEET);
-            var q2 = new Quantity(1.000002, LengthUnit.FEET);
-            Assert.IsFalse(q1.Equals(q2), "Very close values should not be equal");
+            string symbol = LengthUnit.INCH.GetSymbol();
+            Assert.AreEqual("in", symbol);
         }
 
-        // Hash codes for equal objects should match
         [TestMethod]
-        public void GetHashCode_EqualObjects_ShouldMatch()
+        public void GetSymbol_YardUnit_ReturnsYd()
         {
-            var q1 = new Quantity(5.0, LengthUnit.FEET);
-            var q2 = new Quantity(5.0, LengthUnit.FEET);
-            Assert.AreEqual(q1.GetHashCode(), q2.GetHashCode());
+            string symbol = LengthUnit.YARD.GetSymbol();
+            Assert.AreEqual("yd", symbol);
         }
 
-        // Hash codes for different objects should differ
         [TestMethod]
-        public void GetHashCode_DifferentObjects_ShouldDiffer()
+        public void GetSymbol_CentimeterUnit_ReturnsCm()
         {
-            var q1 = new Quantity(5.0, LengthUnit.FEET);
-            var q2 = new Quantity(6.0, LengthUnit.FEET);
-            Assert.AreNotEqual(q1.GetHashCode(), q2.GetHashCode());
+            string symbol = LengthUnit.CENTIMETER.GetSymbol();
+            Assert.AreEqual("cm", symbol);
         }
 
-        // Hash codes for cross-unit equivalent objects should match
         [TestMethod]
-        public void GetHashCode_CrossUnitEquivalent_ShouldMatch()
+        public void GetUnitName_FeetUnit_ReturnsFeet()
         {
-            var q1 = new Quantity(1.0, LengthUnit.FEET);
-            var q2 = new Quantity(12.0, LengthUnit.INCH);
-            Assert.AreEqual(q1.GetHashCode(), q2.GetHashCode(), "Equivalent quantities should have the same hash");
+            string name = LengthUnit.FEET.GetUnitName();
+            Assert.AreEqual("feet", name);
         }
 
-        // ToString() formatting for feet
         [TestMethod]
-        public void ToString_FeetFormatting_ShouldBeCorrect()
+        public void GetUnitName_InchUnit_ReturnsInches()
         {
-            var q = new Quantity(7.5, LengthUnit.FEET);
-            Assert.AreEqual("7.5 ft", q.ToString());
+            string name = LengthUnit.INCH.GetUnitName();
+            Assert.AreEqual("inches", name);
         }
 
-        // ToString() formatting for inches
         [TestMethod]
-        public void ToString_InchFormatting_ShouldBeCorrect()
+        public void GetUnitName_YardUnit_ReturnsYards()
         {
-            var q = new Quantity(7.5, LengthUnit.INCH);
-            Assert.AreEqual("7.5 in", q.ToString());
+            string name = LengthUnit.YARD.GetUnitName();
+            Assert.AreEqual("yards", name);
+        }
+
+        [TestMethod]
+        public void GetUnitName_CentimeterUnit_ReturnsCentimeters()
+        {
+            string name = LengthUnit.CENTIMETER.GetUnitName();
+            Assert.AreEqual("centimeters", name);
+        }
+
+        [TestMethod]
+        public void ToFeetFactor_InvalidUnit_ThrowsException()
+        {
+            LengthUnit invalidUnit = (LengthUnit)99;
+
+            Assert.ThrowsException<ArgumentException>(() => invalidUnit.ToFeetFactor());
+        }
+
+        [TestMethod]
+        public void ConvertToBaseUnit_InvalidUnit_ThrowsException()
+        {
+            LengthUnit invalidUnit = (LengthUnit)99;
+
+            Assert.ThrowsException<ArgumentException>(() => invalidUnit.ConvertToBaseUnit(10.0));
+        }
+
+        [TestMethod]
+        public void ConvertFromBaseUnit_InvalidUnit_ThrowsException()
+        {
+            LengthUnit invalidUnit = (LengthUnit)99;
+
+            Assert.ThrowsException<ArgumentException>(() => invalidUnit.ConvertFromBaseUnit(10.0));
         }
     }
 }

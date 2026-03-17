@@ -1,239 +1,264 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuantityMeasurementApp.Enums;
 using QuantityMeasurementApp.Models;
 
 namespace QuantityMeasurementApp.Tests.Models
 {
-    /// <summary>
-    /// Unit tests focused on validating quantity addition behavior.
-    /// Covers addition logic across all supported measurement units.
-    /// </summary>
     [TestClass]
-    public class QuantityAdditionTests
+    public class QuantityTests
     {
         private const double Tolerance = 0.000001;
 
-        #region Same-Unit Addition Tests
-
-        /// <summary>
-        /// Validates addition when both quantities are measured in feet.
-        /// Expected outcome: 1 foot added to 2 feet results in 3 feet.
-        /// </summary>
         [TestMethod]
-        public void Add_SameUnit_FeetPlusFeet_ReturnsCorrectSum()
+        public void Equals_SameUnitAndValue_ShouldBeTrue()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.FEET);
+            var q2 = new Quantity(1.0, LengthUnit.FEET);
+            Assert.IsTrue(q1.Equals(q2));
+        }
+
+        [TestMethod]
+        public void Equals_SameUnitDifferentValue_ShouldBeFalse()
         {
             var q1 = new Quantity(1.0, LengthUnit.FEET);
             var q2 = new Quantity(2.0, LengthUnit.FEET);
-
-            var result = q1.Add(q2);
-
-            Assert.AreEqual(3.0, result.Value, Tolerance);
-            Assert.AreEqual(LengthUnit.FEET, result.Unit);
+            Assert.IsFalse(q1.Equals(q2));
         }
 
-        /// <summary>
-        /// Confirms correct behavior when adding inch values together.
-        /// Example: 6 inches combined with 6 inches equals 12 inches.
-        /// </summary>
         [TestMethod]
-        public void Add_SameUnit_InchPlusInch_ReturnsCorrectSum()
+        public void Equals_SameInchValue_ShouldBeTrue()
         {
-            var q1 = new Quantity(6.0, LengthUnit.INCH);
-            var q2 = new Quantity(6.0, LengthUnit.INCH);
+            var q1 = new Quantity(1.0, LengthUnit.INCH);
+            var q2 = new Quantity(1.0, LengthUnit.INCH);
+            Assert.IsTrue(q1.Equals(q2));
+        }
 
-            var result = q1.Add(q2);
+        [TestMethod]
+        public void Equals_DifferentInchValue_ShouldBeFalse()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.INCH);
+            var q2 = new Quantity(2.0, LengthUnit.INCH);
+            Assert.IsFalse(q1.Equals(q2));
+        }
+
+        [TestMethod]
+        public void Equals_FeetAndInchEquivalent_ShouldBeTrue()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.FEET);
+            var q2 = new Quantity(12.0, LengthUnit.INCH);
+            Assert.IsTrue(q1.Equals(q2));
+        }
+
+        [TestMethod]
+        public void Equals_InchAndFeetSymmetry_ShouldBeTrue()
+        {
+            var q1 = new Quantity(12.0, LengthUnit.INCH);
+            var q2 = new Quantity(1.0, LengthUnit.FEET);
+            Assert.IsTrue(q1.Equals(q2));
+        }
+
+        [TestMethod]
+        public void Equals_FeetAndInchNotEquivalent_ShouldBeFalse()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.FEET);
+            var q2 = new Quantity(13.0, LengthUnit.INCH);
+            Assert.IsFalse(q1.Equals(q2));
+        }
+
+        [TestMethod]
+        public void Equals_ReflexiveProperty_ShouldBeTrue()
+        {
+            var q = new Quantity(1.0, LengthUnit.FEET);
+            Assert.IsTrue(q.Equals(q));
+        }
+
+        [TestMethod]
+        public void Equals_NullCheck_ShouldBeFalse()
+        {
+            var q = new Quantity(1.0, LengthUnit.FEET);
+            Assert.IsFalse(q.Equals(null));
+        }
+
+        [TestMethod]
+        public void Equals_SymmetricRule_ShouldBeTrue()
+        {
+            var q1 = new Quantity(1.5, LengthUnit.FEET);
+            var q2 = new Quantity(1.5, LengthUnit.FEET);
+            Assert.IsTrue(q1.Equals(q2) && q2.Equals(q1));
+        }
+
+        [TestMethod]
+        public void Equals_TransitiveRule_ShouldBeTrue()
+        {
+            var qA = new Quantity(2.5, LengthUnit.FEET);
+            var qB = new Quantity(2.5, LengthUnit.FEET);
+            var qC = new Quantity(2.5, LengthUnit.FEET);
+            Assert.IsTrue(qA.Equals(qB) && qB.Equals(qC) && qA.Equals(qC));
+        }
+
+        [TestMethod]
+        public void Equals_DifferentTypeObject_ShouldBeFalse()
+        {
+            var q = new Quantity(1.0, LengthUnit.FEET);
+            var obj = new object();
+            Assert.IsFalse(q.Equals(obj));
+        }
+
+        [TestMethod]
+        public void Equals_ConsistencyCheck_ShouldBeTrue()
+        {
+            var q1 = new Quantity(3.0, LengthUnit.FEET);
+            var q2 = new Quantity(3.0, LengthUnit.FEET);
+            Assert.IsTrue(q1.Equals(q2) && q1.Equals(q2) && q1.Equals(q2));
+        }
+
+        [TestMethod]
+        public void Equals_FloatingPointPrecision_ShouldBeFalseForTinyDifference()
+        {
+            var q1 = new Quantity(1.000001, LengthUnit.FEET);
+            var q2 = new Quantity(1.000002, LengthUnit.FEET);
+            Assert.IsFalse(q1.Equals(q2));
+        }
+
+        [TestMethod]
+        public void GetHashCode_EqualObjects_ShouldMatch()
+        {
+            var q1 = new Quantity(5.0, LengthUnit.FEET);
+            var q2 = new Quantity(5.0, LengthUnit.FEET);
+            Assert.AreEqual(q1.GetHashCode(), q2.GetHashCode());
+        }
+
+        [TestMethod]
+        public void GetHashCode_DifferentObjects_ShouldDiffer()
+        {
+            var q1 = new Quantity(5.0, LengthUnit.FEET);
+            var q2 = new Quantity(6.0, LengthUnit.FEET);
+            Assert.AreNotEqual(q1.GetHashCode(), q2.GetHashCode());
+        }
+
+        [TestMethod]
+        public void GetHashCode_CrossUnitEquivalent_ShouldMatch()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.FEET);
+            var q2 = new Quantity(12.0, LengthUnit.INCH);
+            Assert.AreEqual(q1.GetHashCode(), q2.GetHashCode());
+        }
+
+        [TestMethod]
+        public void ConvertTo_FeetToInch_ShouldReturnCorrectValue()
+        {
+            var quantity = new Quantity(1.0, LengthUnit.FEET);
+            var result = quantity.ConvertTo(LengthUnit.INCH);
 
             Assert.AreEqual(12.0, result.Value, Tolerance);
             Assert.AreEqual(LengthUnit.INCH, result.Unit);
         }
 
-        /// <summary>
-        /// Ensures correct addition when both inputs are in yards.
-        /// For example, 2 yards plus 3 yards should give 5 yards.
-        /// </summary>
         [TestMethod]
-        public void Add_SameUnit_YardPlusYard_ReturnsCorrectSum()
+        public void ConvertTo_InchToFeet_ShouldReturnCorrectValue()
         {
-            var q1 = new Quantity(2.0, LengthUnit.YARD);
-            var q2 = new Quantity(3.0, LengthUnit.YARD);
+            var quantity = new Quantity(12.0, LengthUnit.INCH);
+            var result = quantity.ConvertTo(LengthUnit.FEET);
 
-            var result = q1.Add(q2);
-
-            Assert.AreEqual(5.0, result.Value, Tolerance);
-            Assert.AreEqual(LengthUnit.YARD, result.Unit);
-        }
-
-        /// <summary>
-        /// Checks addition for centimeter-based quantities.
-        /// Expected: 5 cm added to 5 cm equals 10 cm.
-        /// </summary>
-        [TestMethod]
-        public void Add_SameUnit_CentimeterPlusCentimeter_ReturnsCorrectSum()
-        {
-            var q1 = new Quantity(5.0, LengthUnit.CENTIMETER);
-            var q2 = new Quantity(5.0, LengthUnit.CENTIMETER);
-
-            var result = q1.Add(q2);
-
-            Assert.AreEqual(10.0, result.Value, Tolerance);
-            Assert.AreEqual(LengthUnit.CENTIMETER, result.Unit);
-        }
-
-        #endregion
-
-        #region Cross-Unit Addition Tests
-
-        /// <summary>
-        /// Verifies mixed-unit addition where feet is the target unit.
-        /// Example: 1 foot plus 12 inches should convert to 2 feet.
-        /// </summary>
-        [TestMethod]
-        public void Add_CrossUnit_FeetPlusInches_ResultInFeet_ReturnsCorrectSum()
-        {
-            var feet = new Quantity(1.0, LengthUnit.FEET);
-            var inches = new Quantity(12.0, LengthUnit.INCH);
-
-            var result = feet.Add(inches);
-
-            Assert.AreEqual(2.0, result.Value, Tolerance);
+            Assert.AreEqual(1.0, result.Value, Tolerance);
             Assert.AreEqual(LengthUnit.FEET, result.Unit);
         }
 
-        /// <summary>
-        /// Ensures inches remain the output unit when inches are the first operand.
-        /// Expected: 12 inches plus 1 foot equals 24 inches.
-        /// </summary>
         [TestMethod]
-        public void Add_CrossUnit_InchesPlusFeet_ResultInInches_ReturnsCorrectSum()
+        public void ConvertTo_YardToFeet_ShouldReturnCorrectValue()
         {
-            var inches = new Quantity(12.0, LengthUnit.INCH);
-            var feet = new Quantity(1.0, LengthUnit.FEET);
-
-            var result = inches.Add(feet);
-
-            Assert.AreEqual(24.0, result.Value, Tolerance);
-            Assert.AreEqual(LengthUnit.INCH, result.Unit);
-        }
-
-        /// <summary>
-        /// Tests yard and foot combination with yard as the output.
-        /// Expected conversion: 1 yard plus 3 feet equals 2 yards.
-        /// </summary>
-        [TestMethod]
-        public void Add_CrossUnit_YardPlusFeet_ResultInYards_ReturnsCorrectSum()
-        {
-            var yard = new Quantity(1.0, LengthUnit.YARD);
-            var feet = new Quantity(3.0, LengthUnit.FEET);
-
-            var result = yard.Add(feet);
-
-            Assert.AreEqual(2.0, result.Value, Tolerance);
-            Assert.AreEqual(LengthUnit.YARD, result.Unit);
-        }
-
-        /// <summary>
-        /// Confirms correct behavior when inches are added to yards.
-        /// Example: 36 inches combined with 1 yard equals 2 yards.
-        /// </summary>
-        [TestMethod]
-        public void Add_CrossUnit_YardPlusInches_ResultInYards_ReturnsCorrectSum()
-        {
-            var yard = new Quantity(1.0, LengthUnit.YARD);
-            var inches = new Quantity(36.0, LengthUnit.INCH);
-
-            var result = yard.Add(inches);
-
-            Assert.AreEqual(2.0, result.Value, Tolerance);
-            Assert.AreEqual(LengthUnit.YARD, result.Unit);
-        }
-
-        /// <summary>
-        /// Ensures accurate conversion when centimeters are added to inches.
-        /// Example: 2.54 cm plus 1 inch equals 5.08 cm.
-        /// </summary>
-        [TestMethod]
-        public void Add_CrossUnit_CentimeterPlusInch_ResultInCentimeters_ReturnsCorrectSum()
-        {
-            var cm = new Quantity(2.54, LengthUnit.CENTIMETER);
-            var inch = new Quantity(1.0, LengthUnit.INCH);
-
-            var result = cm.Add(inch);
-
-            Assert.AreEqual(5.08, result.Value, Tolerance);
-            Assert.AreEqual(LengthUnit.CENTIMETER, result.Unit);
-        }
-
-        #endregion
-
-        #region Zero Addition Tests
-
-        /// <summary>
-        /// Confirms that adding zero does not modify the original quantity.
-        /// Zero may be expressed in any compatible unit.
-        /// </summary>
-        [TestMethod]
-        public void Add_WithZero_ReturnsOriginalValue()
-        {
-            var q = new Quantity(5.0, LengthUnit.FEET);
-            var zero = new Quantity(0.0, LengthUnit.INCH);
-
-            var result = q.Add(zero);
-
-            Assert.AreEqual(5.0, result.Value, Tolerance);
-            Assert.AreEqual(LengthUnit.FEET, result.Unit);
-        }
-
-        #endregion
-
-        #region Negative Value Tests
-
-        /// <summary>
-        /// Validates addition behavior when negative values are involved.
-        /// Example: 5 feet plus -2 feet should result in 3 feet.
-        /// </summary>
-        [TestMethod]
-        public void Add_WithNegativeValues_ReturnsCorrectSum()
-        {
-            var q1 = new Quantity(5.0, LengthUnit.FEET);
-            var q2 = new Quantity(-2.0, LengthUnit.FEET);
-
-            var result = q1.Add(q2);
+            var quantity = new Quantity(1.0, LengthUnit.YARD);
+            var result = quantity.ConvertTo(LengthUnit.FEET);
 
             Assert.AreEqual(3.0, result.Value, Tolerance);
             Assert.AreEqual(LengthUnit.FEET, result.Unit);
         }
 
-        #endregion
-
-        #region Null and Invalid Input Tests
-
-        /// <summary>
-        /// Ensures the Add method throws an exception when a null operand is used.
-        /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void Add_NullOperand_ThrowsArgumentNullException()
+        public void ConvertTo_CentimeterToInch_ShouldReturnCorrectValue()
         {
-            var q1 = new Quantity(1.0, LengthUnit.FEET);
-            Quantity? q2 = null;
+            var quantity = new Quantity(2.54, LengthUnit.CENTIMETER);
+            var result = quantity.ConvertTo(LengthUnit.INCH);
 
-            q1.Add(q2!);
+            Assert.AreEqual(1.0, result.Value, 0.0001);
+            Assert.AreEqual(LengthUnit.INCH, result.Unit);
         }
 
-        /// <summary>
-        /// Verifies that an invalid target unit triggers an ArgumentException.
-        /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void Add_InvalidTargetUnit_ThrowsArgumentException()
+        public void StaticConvert_FeetToInch_ShouldReturnCorrectValue()
         {
-            var q1 = new Quantity(1.0, LengthUnit.FEET);
-            var q2 = new Quantity(1.0, LengthUnit.FEET);
-
-            LengthUnit invalidUnit = (LengthUnit)99;
-            q1.Add(q2, invalidUnit);
+            double result = Quantity.Convert(1.0, LengthUnit.FEET, LengthUnit.INCH);
+            Assert.AreEqual(12.0, result, Tolerance);
         }
 
-        #endregion
+        [TestMethod]
+        public void Add_SameUnit_ShouldReturnCorrectSum()
+        {
+            var q1 = new Quantity(2.0, LengthUnit.FEET);
+            var q2 = new Quantity(3.0, LengthUnit.FEET);
+
+            var result = q1.Add(q2);
+
+            Assert.AreEqual(5.0, result.Value, Tolerance);
+            Assert.AreEqual(LengthUnit.FEET, result.Unit);
+        }
+
+        [TestMethod]
+        public void Add_DifferentUnits_ShouldReturnCorrectSumInFirstUnit()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.FEET);
+            var q2 = new Quantity(12.0, LengthUnit.INCH);
+
+            var result = q1.Add(q2);
+
+            Assert.AreEqual(2.0, result.Value, Tolerance);
+            Assert.AreEqual(LengthUnit.FEET, result.Unit);
+        }
+
+        [TestMethod]
+        public void Add_WithTargetUnit_ShouldReturnCorrectSum()
+        {
+            var q1 = new Quantity(1.0, LengthUnit.FEET);
+            var q2 = new Quantity(12.0, LengthUnit.INCH);
+
+            var result = q1.Add(q2, LengthUnit.YARD);
+
+            Assert.AreEqual(2.0 / 3.0, result.Value, 0.0001);
+            Assert.AreEqual(LengthUnit.YARD, result.Unit);
+        }
+
+        [TestMethod]
+        public void Constructor_NaNValue_ShouldThrowArgumentException()
+        {
+            Assert.ThrowsException<ArgumentException>(() => new Quantity(double.NaN, LengthUnit.FEET));
+        }
+
+        [TestMethod]
+        public void Constructor_InfiniteValue_ShouldThrowArgumentException()
+        {
+            Assert.ThrowsException<ArgumentException>(() => new Quantity(double.PositiveInfinity, LengthUnit.FEET));
+        }
+
+        [TestMethod]
+        public void Convert_InvalidSourceValue_ShouldThrowArgumentException()
+        {
+            Assert.ThrowsException<ArgumentException>(() =>
+                Quantity.Convert(double.NaN, LengthUnit.FEET, LengthUnit.INCH));
+        }
+
+        [TestMethod]
+        public void ToString_FeetFormatting_ShouldBeCorrect()
+        {
+            var q = new Quantity(7.5, LengthUnit.FEET);
+            Assert.AreEqual("7.5 ft", q.ToString());
+        }
+
+        [TestMethod]
+        public void ToString_InchFormatting_ShouldBeCorrect()
+        {
+            var q = new Quantity(7.5, LengthUnit.INCH);
+            Assert.AreEqual("7.5 in", q.ToString());
+        }
     }
 }

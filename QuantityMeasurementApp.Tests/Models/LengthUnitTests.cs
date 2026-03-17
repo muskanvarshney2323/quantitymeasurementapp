@@ -6,74 +6,143 @@ namespace QuantityMeasurementApp.Tests.Models
 {
     /// <summary>
     /// Unit tests for verifying LengthUnit-related functionality,
-    /// including conversion factors, unit symbols, unit names,
-    /// and handling of invalid enum values.
+    /// including conversion factors, base-unit conversion,
+    /// unit symbols, unit names, and invalid enum handling.
     /// </summary>
     [TestClass]
     public class LengthUnitTests
     {
-        private UnitConverter _unitConverter = null!;
-
-        /// <summary>
-        /// Initializes required objects before each test runs.
-        /// </summary>
-        [TestInitialize]
-        public void Setup()
-        {
-            _unitConverter = new UnitConverter();
-        }
+        private const double Tolerance = 0.000001;
 
         /// <summary>
         /// Verifies that FEET returns a conversion factor of 1.0.
         /// </summary>
         [TestMethod]
-        public void GetConversionFactorToFeet_FeetUnit_ReturnsOne()
+        public void ToFeetFactor_FeetUnit_ReturnsOne()
         {
-            double factor = _unitConverter.GetConversionFactorToFeet(LengthUnit.FEET);
-            Assert.AreEqual(1.0, factor, 0.0001);
+            double factor = LengthUnit.FEET.ToFeetFactor();
+            Assert.AreEqual(1.0, factor, Tolerance);
         }
 
         /// <summary>
         /// Verifies that INCH returns a conversion factor of 1/12.
         /// </summary>
         [TestMethod]
-        public void GetConversionFactorToFeet_InchUnit_ReturnsOneTwelfth()
+        public void ToFeetFactor_InchUnit_ReturnsOneTwelfth()
         {
-            double factor = _unitConverter.GetConversionFactorToFeet(LengthUnit.INCH);
-            Assert.AreEqual(1.0 / 12.0, factor, 0.0001);
+            double factor = LengthUnit.INCH.ToFeetFactor();
+            Assert.AreEqual(1.0 / 12.0, factor, Tolerance);
         }
 
         /// <summary>
         /// Verifies that YARD returns a conversion factor of 3.0.
         /// </summary>
         [TestMethod]
-        public void GetConversionFactorToFeet_YardUnit_ReturnsThree()
+        public void ToFeetFactor_YardUnit_ReturnsThree()
         {
-            double factor = _unitConverter.GetConversionFactorToFeet(LengthUnit.YARD);
-            Assert.AreEqual(3.0, factor, 0.0001);
+            double factor = LengthUnit.YARD.ToFeetFactor();
+            Assert.AreEqual(3.0, factor, Tolerance);
         }
 
         /// <summary>
         /// Verifies that CENTIMETER returns the correct conversion factor to feet.
         /// </summary>
         [TestMethod]
-        public void GetConversionFactorToFeet_CentimeterUnit_ReturnsCorrectValue()
+        public void ToFeetFactor_CentimeterUnit_ReturnsCorrectValue()
         {
-            double factor = _unitConverter.GetConversionFactorToFeet(LengthUnit.CENTIMETER);
+            double factor = LengthUnit.CENTIMETER.ToFeetFactor();
+            double expected = 1.0 / 30.48;
 
-            // 1 cm = 1 / (2.54 × 12) feet = 1 / 30.48 feet
-            double expected = 0.0328083989501312;
+            Assert.AreEqual(expected, factor, Tolerance);
+        }
 
-            Assert.AreEqual(expected, factor, 0.0000001);
+        /// <summary>
+        /// Verifies conversion from FEET to base unit FEET.
+        /// </summary>
+        [TestMethod]
+        public void ConvertToBaseUnit_Feet_ReturnsSameValue()
+        {
+            double result = LengthUnit.FEET.ConvertToBaseUnit(5.0);
+            Assert.AreEqual(5.0, result, Tolerance);
+        }
+
+        /// <summary>
+        /// Verifies conversion from INCH to base unit FEET.
+        /// </summary>
+        [TestMethod]
+        public void ConvertToBaseUnit_Inch_ReturnsFeetValue()
+        {
+            double result = LengthUnit.INCH.ConvertToBaseUnit(12.0);
+            Assert.AreEqual(1.0, result, Tolerance);
+        }
+
+        /// <summary>
+        /// Verifies conversion from YARD to base unit FEET.
+        /// </summary>
+        [TestMethod]
+        public void ConvertToBaseUnit_Yard_ReturnsFeetValue()
+        {
+            double result = LengthUnit.YARD.ConvertToBaseUnit(1.0);
+            Assert.AreEqual(3.0, result, Tolerance);
+        }
+
+        /// <summary>
+        /// Verifies conversion from CENTIMETER to base unit FEET.
+        /// </summary>
+        [TestMethod]
+        public void ConvertToBaseUnit_Centimeter_ReturnsFeetValue()
+        {
+            double result = LengthUnit.CENTIMETER.ConvertToBaseUnit(30.48);
+            Assert.AreEqual(1.0, result, Tolerance);
+        }
+
+        /// <summary>
+        /// Verifies conversion from base unit FEET to FEET.
+        /// </summary>
+        [TestMethod]
+        public void ConvertFromBaseUnit_Feet_ReturnsSameValue()
+        {
+            double result = LengthUnit.FEET.ConvertFromBaseUnit(2.0);
+            Assert.AreEqual(2.0, result, Tolerance);
+        }
+
+        /// <summary>
+        /// Verifies conversion from base unit FEET to INCH.
+        /// </summary>
+        [TestMethod]
+        public void ConvertFromBaseUnit_Inch_ReturnsInchValue()
+        {
+            double result = LengthUnit.INCH.ConvertFromBaseUnit(1.0);
+            Assert.AreEqual(12.0, result, Tolerance);
+        }
+
+        /// <summary>
+        /// Verifies conversion from base unit FEET to YARD.
+        /// </summary>
+        [TestMethod]
+        public void ConvertFromBaseUnit_Yard_ReturnsYardValue()
+        {
+            double result = LengthUnit.YARD.ConvertFromBaseUnit(3.0);
+            Assert.AreEqual(1.0, result, Tolerance);
+        }
+
+        /// <summary>
+        /// Verifies conversion from base unit FEET to CENTIMETER.
+        /// </summary>
+        [TestMethod]
+        public void ConvertFromBaseUnit_Centimeter_ReturnsCentimeterValue()
+        {
+            double result = LengthUnit.CENTIMETER.ConvertFromBaseUnit(1.0);
+            Assert.AreEqual(30.48, result, Tolerance);
         }
 
         /// <summary>
         /// Verifies that FEET returns the symbol "ft".
         /// </summary>
         [TestMethod]
-        public void GetUnitSymbol_FeetUnit_ReturnsFt()
+        public void GetSymbol_FeetUnit_ReturnsFt()
         {
-            string symbol = LengthUnit.FEET.GetUnitSymbol();
+            string symbol = LengthUnit.FEET.GetSymbol();
             Assert.AreEqual("ft", symbol);
         }
 
@@ -81,9 +150,9 @@ namespace QuantityMeasurementApp.Tests.Models
         /// Verifies that INCH returns the symbol "in".
         /// </summary>
         [TestMethod]
-        public void GetUnitSymbol_InchUnit_ReturnsIn()
+        public void GetSymbol_InchUnit_ReturnsIn()
         {
-            string symbol = LengthUnit.INCH.GetUnitSymbol();
+            string symbol = LengthUnit.INCH.GetSymbol();
             Assert.AreEqual("in", symbol);
         }
 
@@ -91,9 +160,9 @@ namespace QuantityMeasurementApp.Tests.Models
         /// Verifies that YARD returns the symbol "yd".
         /// </summary>
         [TestMethod]
-        public void GetUnitSymbol_YardUnit_ReturnsYd()
+        public void GetSymbol_YardUnit_ReturnsYd()
         {
-            string symbol = LengthUnit.YARD.GetUnitSymbol();
+            string symbol = LengthUnit.YARD.GetSymbol();
             Assert.AreEqual("yd", symbol);
         }
 
@@ -101,9 +170,9 @@ namespace QuantityMeasurementApp.Tests.Models
         /// Verifies that CENTIMETER returns the symbol "cm".
         /// </summary>
         [TestMethod]
-        public void GetUnitSymbol_CentimeterUnit_ReturnsCm()
+        public void GetSymbol_CentimeterUnit_ReturnsCm()
         {
-            string symbol = LengthUnit.CENTIMETER.GetUnitSymbol();
+            string symbol = LengthUnit.CENTIMETER.GetSymbol();
             Assert.AreEqual("cm", symbol);
         }
 
@@ -152,12 +221,38 @@ namespace QuantityMeasurementApp.Tests.Models
         /// for an undefined enum value throws an ArgumentException.
         /// </summary>
         [TestMethod]
-        public void GetConversionFactorToFeet_InvalidUnit_ThrowsException()
+        public void ToFeetFactor_InvalidUnit_ThrowsException()
         {
             LengthUnit invalidUnit = (LengthUnit)99;
 
             Assert.ThrowsException<ArgumentException>(() =>
-                _unitConverter.GetConversionFactorToFeet(invalidUnit)
+                invalidUnit.ToFeetFactor()
+            );
+        }
+
+        /// <summary>
+        /// Ensures that converting an invalid unit to base unit throws an exception.
+        /// </summary>
+        [TestMethod]
+        public void ConvertToBaseUnit_InvalidUnit_ThrowsException()
+        {
+            LengthUnit invalidUnit = (LengthUnit)99;
+
+            Assert.ThrowsException<ArgumentException>(() =>
+                invalidUnit.ConvertToBaseUnit(10.0)
+            );
+        }
+
+        /// <summary>
+        /// Ensures that converting from base unit using an invalid unit throws an exception.
+        /// </summary>
+        [TestMethod]
+        public void ConvertFromBaseUnit_InvalidUnit_ThrowsException()
+        {
+            LengthUnit invalidUnit = (LengthUnit)99;
+
+            Assert.ThrowsException<ArgumentException>(() =>
+                invalidUnit.ConvertFromBaseUnit(10.0)
             );
         }
     }

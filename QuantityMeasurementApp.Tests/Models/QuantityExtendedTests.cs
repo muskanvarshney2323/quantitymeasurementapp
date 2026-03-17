@@ -1,24 +1,14 @@
+
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuantityMeasurementApp.Enums;
 using QuantityMeasurementApp.Models;
 
 namespace QuantityMeasurementApp.Tests.Models
 {
-    /// <summary>
-    /// Comprehensive tests for the Quantity class.
-    /// Validates equality behavior across multiple units,
-    /// conversion accuracy, transitive consistency,
-    /// hash code reliability, and string formatting output.
-    /// </summary>
     [TestClass]
     public class QuantityExtendedTests
     {
-        // Precision threshold for floating-point checks
-        private const double Precision = 0.000001;
-
-        #region Yard Related Tests
-
-        // Same yard values should be equal
         [TestMethod]
         public void Equals_YardSameValue_ReturnsTrue()
         {
@@ -28,7 +18,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsTrue(first.Equals(second));
         }
 
-        // Different yard values should not be equal
         [TestMethod]
         public void Equals_YardDifferentValue_ReturnsFalse()
         {
@@ -38,7 +27,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsFalse(first.Equals(second));
         }
 
-        // 1 yard should match 3 feet
         [TestMethod]
         public void Equals_YardAndFeetEquivalent_ReturnsTrue()
         {
@@ -48,7 +36,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsTrue(yard.Equals(feet));
         }
 
-        // 1 yard should match 36 inches
         [TestMethod]
         public void Equals_YardAndInchesEquivalent_ReturnsTrue()
         {
@@ -58,7 +45,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsTrue(yard.Equals(inches));
         }
 
-        // Non-equivalent yard and feet values
         [TestMethod]
         public void Equals_YardAndFeetNonEquivalent_ReturnsFalse()
         {
@@ -68,11 +54,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsFalse(yard.Equals(feet));
         }
 
-        #endregion
-
-        #region Centimeter Related Tests
-
-        // Same centimeter values should be equal
         [TestMethod]
         public void Equals_CentimeterSameValue_ReturnsTrue()
         {
@@ -82,7 +63,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsTrue(first.Equals(second));
         }
 
-        // 30.48 cm equals 1 foot
         [TestMethod]
         public void Equals_CentimeterAndFeetEquivalent_ReturnsTrue()
         {
@@ -92,7 +72,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsTrue(cm.Equals(ft));
         }
 
-        // 91.44 cm equals 1 yard
         [TestMethod]
         public void Equals_CentimeterAndYardEquivalent_ReturnsTrue()
         {
@@ -102,7 +81,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsTrue(cm.Equals(yard));
         }
 
-        // 1 cm should not equal 1 inch
         [TestMethod]
         public void Equals_CentimeterAndInchNonEquivalent_ReturnsFalse()
         {
@@ -112,11 +90,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsFalse(cm.Equals(inch));
         }
 
-        #endregion
-
-        #region Transitive Equality Tests
-
-        // Transitive property across yard, feet, and inches
         [TestMethod]
         public void Equals_Transitive_YardFeetInches_ReturnsTrue()
         {
@@ -129,7 +102,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsTrue(yard.Equals(inches));
         }
 
-        // Transitive property across cm, inches, and feet
         [TestMethod]
         public void Equals_Transitive_CmInchesFeet_ReturnsTrue()
         {
@@ -142,11 +114,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsTrue(cm.Equals(feet));
         }
 
-        #endregion
-
-        #region Edge Case Validation
-
-        // Object should equal itself
         [TestMethod]
         public void Equals_SameReference_ReturnsTrue()
         {
@@ -154,7 +121,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsTrue(value.Equals(value));
         }
 
-        // Comparison with null should return false
         [TestMethod]
         public void Equals_NullComparison_ReturnsFalse()
         {
@@ -162,7 +128,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsFalse(value.Equals(null));
         }
 
-        // Comparison with unrelated object type should return false
         [TestMethod]
         public void Equals_DifferentType_ReturnsFalse()
         {
@@ -170,11 +135,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.IsFalse(value.Equals(new object()));
         }
 
-        #endregion
-
-        #region Hash Code Consistency
-
-        // Equal objects must produce identical hash codes
         [TestMethod]
         public void GetHashCode_EquivalentValues_ReturnSameHash()
         {
@@ -184,11 +144,6 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.AreEqual(yard.GetHashCode(), feet.GetHashCode());
         }
 
-        #endregion
-
-        #region ToString Formatting
-
-        // Verify formatted output for yard
         [TestMethod]
         public void ToString_Yard_ReturnsFormattedText()
         {
@@ -196,14 +151,11 @@ namespace QuantityMeasurementApp.Tests.Models
             Assert.AreEqual("7.5 yd", value.ToString());
         }
 
-        // Verify formatted output for centimeter
         [TestMethod]
         public void ToString_Centimeter_ReturnsFormattedText()
         {
             var value = new Quantity(7.5, LengthUnit.CENTIMETER);
             Assert.AreEqual("7.5 cm", value.ToString());
         }
-
-        #endregion
     }
 }

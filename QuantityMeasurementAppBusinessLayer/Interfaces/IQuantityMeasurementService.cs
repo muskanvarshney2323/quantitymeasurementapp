@@ -1,15 +1,13 @@
-using System.Collections.Generic;
 using QuantityMeasurementAppModel.DTOs;
-using QuantityMeasurementAppModel.Requests;
 
-namespace QuantityMeasurementAppBusinessLayer.Interfaces
+namespace QuantityMeasurementAppBusinessLayer.Services
 {
     public interface IQuantityMeasurementService
     {
-        string AddQuantity(QuantityRequest request);
-        List<QuantityDTO> GetAllQuantities();
-        QuantityDTO GetQuantityById(int id);
-        string UpdateQuantity(QuantityDTO quantityDto);
-        string DeleteQuantity(int id);
+        bool Compare(QuantityDTO q1, QuantityDTO q2);
+        QuantityDTO Convert(QuantityDTO source, string targetUnit);
+        QuantityDTO Add(QuantityDTO q1, QuantityDTO q2);
+        QuantityDTO Subtract(QuantityDTO q1, QuantityDTO q2);
+        double Divide(QuantityDTO q1, QuantityDTO q2);
     }
 }

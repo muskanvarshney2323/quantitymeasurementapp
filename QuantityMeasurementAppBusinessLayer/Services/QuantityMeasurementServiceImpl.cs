@@ -1,8 +1,4 @@
-using System.Collections.Generic;
-using QuantityMeasurementAppBusinessLayer.Interfaces;
 using QuantityMeasurementAppModel.DTOs;
-using QuantityMeasurementAppModel.Entity;
-using QuantityMeasurementAppModel.Requests;
 using QuantityMeasurementAppRepositoryLayer;
 
 namespace QuantityMeasurementAppBusinessLayer.Services
@@ -16,67 +12,44 @@ namespace QuantityMeasurementAppBusinessLayer.Services
             _repository = repository;
         }
 
-        public string AddQuantity(QuantityRequest request)
+        public bool Compare(QuantityDTO q1, QuantityDTO q2)
         {
-            QuantityMeasurementEntity entity = new QuantityMeasurementEntity
-            {
-                Value = request.Value,
-                Unit = request.UnitType
-            };
-
-            return _repository.AddQuantity(entity);
+            return q1.Value == q2.Value && q1.Unit == q2.Unit;
         }
 
-        public List<QuantityDTO> GetAllQuantities()
+        public QuantityDTO Convert(QuantityDTO source, string targetUnit)
         {
-            List<QuantityMeasurementEntity> entities = _repository.GetAllQuantities();
-            List<QuantityDTO> dtoList = new List<QuantityDTO>();
-
-            foreach (QuantityMeasurementEntity entity in entities)
-            {
-                dtoList.Add(new QuantityDTO
-                {
-                    Id = entity.Id,
-                    Value = entity.Value,
-                    Unit = entity.Unit
-                });
-            }
-
-            return dtoList;
-        }
-
-        public QuantityDTO GetQuantityById(int id)
-        {
-            QuantityMeasurementEntity entity = _repository.GetQuantityById(id);
-
-            if (entity == null)
-            {
-                return null;
-            }
-
             return new QuantityDTO
             {
-                Id = entity.Id,
-                Value = entity.Value,
-                Unit = entity.Unit
+                Value = source.Value,
+                Unit = targetUnit
             };
         }
 
-        public string UpdateQuantity(QuantityDTO quantityDto)
+        public QuantityDTO Add(QuantityDTO q1, QuantityDTO q2)
         {
-            QuantityMeasurementEntity entity = new QuantityMeasurementEntity
+            return new QuantityDTO
             {
-                Id = quantityDto.Id,
-                Value = quantityDto.Value,
-                Unit = quantityDto.Unit
+                Value = q1.Value + q2.Value,
+                Unit = q1.Unit
             };
-
-            return _repository.UpdateQuantity(entity);
         }
 
-        public string DeleteQuantity(int id)
+        public QuantityDTO Subtract(QuantityDTO q1, QuantityDTO q2)
         {
-            return _repository.DeleteQuantity(id);
+            return new QuantityDTO
+            {
+                Value = q1.Value - q2.Value,
+                Unit = q1.Unit
+            };
+        }
+
+        public double Divide(QuantityDTO q1, QuantityDTO q2)
+        {
+            if (q2.Value == 0)
+                throw new DivideByZeroException("Cannot divide by zero.");
+
+            return q1.Value / q2.Value;
         }
     }
 }

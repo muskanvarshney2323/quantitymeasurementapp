@@ -1,6 +1,6 @@
+using System;
 using QuantityMeasurementApp.Console.Controllers;
 using QuantityMeasurementAppModel.DTOs;
-using QuantityMeasurementAppModel.Requests;
 
 namespace QuantityMeasurementApp.Console.Menu
 {
@@ -13,148 +13,202 @@ namespace QuantityMeasurementApp.Console.Menu
             _controller = controller;
         }
 
-        public void Show()
+        public void ShowMenu()
         {
-            bool exit = false;
-
-            while (!exit)
+            while (true)
             {
-                System.Console.WriteLine();
-                System.Console.WriteLine("===== Quantity Measurement Menu =====");
-                System.Console.WriteLine("1. Add Quantity");
-                System.Console.WriteLine("2. View All Quantities");
-                System.Console.WriteLine("3. Get Quantity By Id");
-                System.Console.WriteLine("4. Update Quantity");
-                System.Console.WriteLine("5. Delete Quantity");
+                System.Console.WriteLine("\n=== Quantity Measurement Menu ===");
+                System.Console.WriteLine("1. Add");
+                System.Console.WriteLine("2. Subtract");
+                System.Console.WriteLine("3. Divide");
+                System.Console.WriteLine("4. Convert");
+                System.Console.WriteLine("5. Compare");
                 System.Console.WriteLine("6. Exit");
                 System.Console.Write("Enter your choice: ");
 
-                bool isValidChoice = int.TryParse(System.Console.ReadLine(), out int choice);
-
-                if (!isValidChoice)
+                if (!int.TryParse(System.Console.ReadLine(), out int operationChoice))
                 {
-                    System.Console.WriteLine("Invalid input. Please enter a number.");
+                    System.Console.WriteLine("Invalid input.");
                     continue;
                 }
 
-                switch (choice)
+                if (operationChoice == 6)
                 {
-                    case 1:
-                        AddQuantityFlow();
-                        break;
+                    System.Console.WriteLine("Exiting application...");
+                    break;
+                }
 
-                    case 2:
-                        _controller.GetAllQuantities();
-                        break;
-
-                    case 3:
-                        GetQuantityByIdFlow();
-                        break;
-
-                    case 4:
-                        UpdateQuantityFlow();
-                        break;
-
-                    case 5:
-                        DeleteQuantityFlow();
-                        break;
-
-                    case 6:
-                        System.Console.WriteLine("Thank you for using the application!");
-                        exit = true;
-                        break;
-
-                    default:
-                        System.Console.WriteLine("Invalid choice. Please try again.");
-                        break;
+                try
+                {
+                    switch (operationChoice)
+                    {
+                        case 1:
+                            HandleAdd();
+                            break;
+                        case 2:
+                            HandleSubtract();
+                            break;
+                        case 3:
+                            HandleDivide();
+                            break;
+                        case 4:
+                            HandleConvert();
+                            break;
+                        case 5:
+                            HandleCompare();
+                            break;
+                        default:
+                            System.Console.WriteLine("Invalid choice.");
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Console.WriteLine($"Error: {ex.Message}");
                 }
             }
-
-            System.Console.WriteLine("\nApplication closed successfully.");
         }
 
-        private void AddQuantityFlow()
+        private void HandleAdd()
         {
-            System.Console.Write("Enter unit: ");
-            string? unit = System.Console.ReadLine();
+            System.Console.WriteLine("\n--- Add Operation ---");
+            QuantityDTO q1 = ReadQuantity("first");
+            QuantityDTO q2 = ReadQuantity("second");
 
-            System.Console.Write("Enter value: ");
-            bool isValueValid = double.TryParse(System.Console.ReadLine(), out double value);
+            QuantityDTO result = _controller.Add(q1, q2);
+            System.Console.WriteLine($"Result: {result.Value} {result.Unit}");
+        }
 
-            if (!isValueValid)
+        private void HandleSubtract()
+        {
+            System.Console.WriteLine("\n--- Subtract Operation ---");
+            QuantityDTO q1 = ReadQuantity("first");
+            QuantityDTO q2 = ReadQuantity("second");
+
+            QuantityDTO result = _controller.Subtract(q1, q2);
+            System.Console.WriteLine($"Result: {result.Value} {result.Unit}");
+        }
+
+        private void HandleDivide()
+        {
+            System.Console.WriteLine("\n--- Divide Operation ---");
+            QuantityDTO q1 = ReadQuantity("first");
+            QuantityDTO q2 = ReadQuantity("second");
+
+            double result = _controller.Divide(q1, q2);
+            System.Console.WriteLine($"Result: {result}");
+        }
+
+        private void HandleConvert()
+        {
+            System.Console.WriteLine("\n--- Convert Operation ---");
+            QuantityDTO source = ReadQuantity("source");
+
+            System.Console.Write("Enter target unit: ");
+            string targetUnit = System.Console.ReadLine() ?? "";
+
+            QuantityDTO result = _controller.Convert(source, targetUnit);
+            System.Console.WriteLine($"Converted Result: {result.Value} {result.Unit}");
+        }
+
+        private void HandleCompare()
+        {
+            System.Console.WriteLine("\n--- Compare Operation ---");
+            QuantityDTO q1 = ReadQuantity("first");
+            QuantityDTO q2 = ReadQuantity("second");
+
+            bool isEqual = _controller.Compare(q1, q2);
+            System.Console.WriteLine($"Are both quantities equal? {isEqual}");
+        }
+
+        private QuantityDTO ReadQuantity(string label)
+        {
+            System.Console.WriteLine($"\nSelect {label} measurement type:");
+            System.Console.WriteLine("1. Length");
+            System.Console.WriteLine("2. Weight");
+            System.Console.WriteLine("3. Volume");
+            System.Console.WriteLine("4. Temperature");
+            System.Console.Write("Enter choice: ");
+
+            int typeChoice = int.Parse(System.Console.ReadLine()!);
+
+            System.Console.Write($"Enter {label} value: ");
+            double value = double.Parse(System.Console.ReadLine()!);
+
+            string unit = GetUnit(typeChoice, label);
+
+            return new QuantityDTO
             {
-                System.Console.WriteLine("Invalid value.");
-                return;
-            }
-
-            QuantityRequest request = new QuantityRequest
-            {
-                UnitType = unit,
-                Value = value
+                Value = value,
+                Unit = unit
             };
-
-            _controller.AddQuantity(request);
         }
 
-        private void GetQuantityByIdFlow()
+        private string GetUnit(int typeChoice, string label)
         {
-            System.Console.Write("Enter quantity id: ");
-            bool isIdValid = int.TryParse(System.Console.ReadLine(), out int id);
-
-            if (!isIdValid)
+            switch (typeChoice)
             {
-                System.Console.WriteLine("Invalid id.");
-                return;
+                case 1:
+                    System.Console.WriteLine($"\nSelect {label} Length Unit:");
+                    System.Console.WriteLine("1. FEET");
+                    System.Console.WriteLine("2. INCH");
+                    System.Console.WriteLine("3. YARD");
+                    System.Console.WriteLine("4. CENTIMETER");
+                    System.Console.Write("Enter choice: ");
+                    return System.Console.ReadLine() switch
+                    {
+                        "1" => "FEET",
+                        "2" => "INCH",
+                        "3" => "YARD",
+                        "4" => "CENTIMETER",
+                        _ => throw new Exception("Invalid length unit")
+                    };
+
+                case 2:
+                    System.Console.WriteLine($"\nSelect {label} Weight Unit:");
+                    System.Console.WriteLine("1. KILOGRAM");
+                    System.Console.WriteLine("2. GRAM");
+                    System.Console.WriteLine("3. TONNE");
+                    System.Console.Write("Enter choice: ");
+                    return System.Console.ReadLine() switch
+                    {
+                        "1" => "KILOGRAM",
+                        "2" => "GRAM",
+                        "3" => "TONNE",
+                        _ => throw new Exception("Invalid weight unit")
+                    };
+
+                case 3:
+                    System.Console.WriteLine($"\nSelect {label} Volume Unit:");
+                    System.Console.WriteLine("1. LITRE");
+                    System.Console.WriteLine("2. MILLILITRE");
+                    System.Console.WriteLine("3. GALLON");
+                    System.Console.Write("Enter choice: ");
+                    return System.Console.ReadLine() switch
+                    {
+                        "1" => "LITRE",
+                        "2" => "MILLILITRE",
+                        "3" => "GALLON",
+                        _ => throw new Exception("Invalid volume unit")
+                    };
+
+                case 4:
+                    System.Console.WriteLine($"\nSelect {label} Temperature Unit:");
+                    System.Console.WriteLine("1. CELSIUS");
+                    System.Console.WriteLine("2. FAHRENHEIT");
+                    System.Console.WriteLine("3. KELVIN");
+                    System.Console.Write("Enter choice: ");
+                    return System.Console.ReadLine() switch
+                    {
+                        "1" => "CELSIUS",
+                        "2" => "FAHRENHEIT",
+                        "3" => "KELVIN",
+                        _ => throw new Exception("Invalid temperature unit")
+                    };
+
+                default:
+                    throw new Exception("Invalid measurement type");
             }
-
-            _controller.GetQuantityById(id);
-        }
-
-        private void UpdateQuantityFlow()
-        {
-            System.Console.Write("Enter quantity id: ");
-            bool isIdValid = int.TryParse(System.Console.ReadLine(), out int id);
-
-            if (!isIdValid)
-            {
-                System.Console.WriteLine("Invalid id.");
-                return;
-            }
-
-            System.Console.Write("Enter unit: ");
-            string? unit = System.Console.ReadLine();
-
-            System.Console.Write("Enter value: ");
-            bool isValueValid = double.TryParse(System.Console.ReadLine(), out double value);
-
-            if (!isValueValid)
-            {
-                System.Console.WriteLine("Invalid value.");
-                return;
-            }
-
-            QuantityDTO quantityDto = new QuantityDTO
-            {
-                Id = id,
-                Unit = unit,
-                Value = value
-            };
-
-            _controller.UpdateQuantity(quantityDto);
-        }
-
-        private void DeleteQuantityFlow()
-        {
-            System.Console.Write("Enter quantity id: ");
-            bool isIdValid = int.TryParse(System.Console.ReadLine(), out int id);
-
-            if (!isIdValid)
-            {
-                System.Console.WriteLine("Invalid id.");
-                return;
-            }
-
-            _controller.DeleteQuantity(id);
         }
     }
 }

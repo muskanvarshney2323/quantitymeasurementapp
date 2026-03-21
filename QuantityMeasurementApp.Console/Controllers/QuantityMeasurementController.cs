@@ -1,7 +1,6 @@
-using System;
-using QuantityMeasurementAppBusinessLayer.Interfaces;
+using QuantityMeasurementAppBusinessLayer.Services;
+using QuantityMeasurementAppModel;
 using QuantityMeasurementAppModel.DTOs;
-using QuantityMeasurementAppModel.Requests;
 
 namespace QuantityMeasurementApp.Console.Controllers
 {
@@ -14,86 +13,29 @@ namespace QuantityMeasurementApp.Console.Controllers
             _service = service;
         }
 
-        public void AddQuantity(QuantityRequest request)
+        public bool Compare(QuantityDTO q1, QuantityDTO q2)
         {
-            try
-            {
-                _service.AddQuantity(request);
-                System.Console.WriteLine("Quantity added successfully.");
-            }
-            catch (Exception ex)
-            {
-                System.Console.WriteLine($"Error while adding quantity: {ex.Message}");
-            }
+            return _service.Compare(q1, q2);
         }
 
-        public void GetAllQuantities()
+        public QuantityDTO Convert(QuantityDTO source, string targetUnit)
         {
-            try
-            {
-                var quantities = _service.GetAllQuantities();
-
-                if (quantities == null)
-                {
-                    System.Console.WriteLine("No quantities found.");
-                    return;
-                }
-
-                foreach (var quantity in quantities)
-                {
-                    System.Console.WriteLine($"Id: {quantity.Id}, Unit: {quantity.Unit}, Value: {quantity.Value}");
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Console.WriteLine($"Error while fetching quantities: {ex.Message}");
-            }
+            return _service.Convert(source, targetUnit);
         }
 
-        public void GetQuantityById(int id)
+        public QuantityDTO Add(QuantityDTO q1, QuantityDTO q2)
         {
-            try
-            {
-                var quantity = _service.GetQuantityById(id);
-
-                if (quantity == null)
-                {
-                    System.Console.WriteLine("Quantity not found.");
-                    return;
-                }
-
-                System.Console.WriteLine($"Id: {quantity.Id}, Unit: {quantity.Unit}, Value: {quantity.Value}");
-            }
-            catch (Exception ex)
-            {
-                System.Console.WriteLine($"Error while fetching quantity: {ex.Message}");
-            }
+            return _service.Add(q1, q2);
         }
 
-        public void UpdateQuantity(QuantityDTO quantityDto)
+        public QuantityDTO Subtract(QuantityDTO q1, QuantityDTO q2)
         {
-            try
-            {
-                _service.UpdateQuantity(quantityDto);
-                System.Console.WriteLine("Quantity updated successfully.");
-            }
-            catch (Exception ex)
-            {
-                System.Console.WriteLine($"Error while updating quantity: {ex.Message}");
-            }
+            return _service.Subtract(q1, q2);
         }
 
-        public void DeleteQuantity(int id)
+        public double Divide(QuantityDTO q1, QuantityDTO q2)
         {
-            try
-            {
-                _service.DeleteQuantity(id);
-                System.Console.WriteLine("Quantity deleted successfully.");
-            }
-            catch (Exception ex)
-            {
-                System.Console.WriteLine($"Error while deleting quantity: {ex.Message}");
-            }
+            return _service.Divide(q1, q2);
         }
     }
 }

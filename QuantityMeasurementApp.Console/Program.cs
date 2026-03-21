@@ -1,12 +1,22 @@
 using QuantityMeasurementApp.Console.Controllers;
 using QuantityMeasurementApp.Console.Menu;
-using QuantityMeasurementAppBusinessLayer;
+using QuantityMeasurementAppBusinessLayer.Interfaces;
+using QuantityMeasurementAppBusinessLayer.Services;
 using QuantityMeasurementAppRepositoryLayer;
+using QuantityMeasurementAppRepositoryLayer.Repositories;
 
-IQuantityMeasurementRepository repository = new QuantityMeasurementCacheRepository();
-IQuantityMeasurementService service = new QuantityMeasurementServiceImpl(repository);
+namespace QuantityMeasurementApp.Console
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            IQuantityMeasurementRepository repository = new QuantityMeasurementCacheRepository();
+            IQuantityMeasurementService service = new QuantityMeasurementServiceImpl(repository);
+            QuantityMeasurementController controller = new QuantityMeasurementController(service);
 
-QuantitiesController controller = new QuantitiesController(service);
-
-MainMenu menu = new MainMenu(controller);
-menu.Start();
+            AppMenu menu = new AppMenu(controller);
+            menu.Show();
+        }
+    }
+}

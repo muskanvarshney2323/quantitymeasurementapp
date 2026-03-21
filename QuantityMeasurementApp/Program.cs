@@ -1,16 +1,17 @@
+using System;
 using QuantityMeasurementApp.Views;
 
 namespace QuantityMeasurementApp
 {
-    // Main program class - now only responsible for launching the application
-    class Program
+    internal class Program
     {
-        // Entry point of the application
         static void Main(string[] args)
         {
-            // Create and display the menu view
+            System.Console.WriteLine("=== Quantity Measurement Application ===");
+            System.Console.WriteLine("UC13: Centralized Arithmetic Logic to Enforce DRY\n");
+
             Menu menu = new Menu();
-            menu.Display();
+            menu.Show();
         }
     }
 }

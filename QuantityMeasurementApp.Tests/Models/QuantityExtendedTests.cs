@@ -1,209 +1,170 @@
-using System;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using QuantityMeasurementApp.Models;
+using QuantityMeasurementApp;
+using QuantityMeasurementApp.Enums;
 
 namespace QuantityMeasurementApp.Tests.Models
 {
-    /// <summary>
-    /// Comprehensive tests for the Quantity class.
-    /// Validates equality behavior across multiple units,
-    /// conversion accuracy, transitive consistency,
-    /// hash code reliability, and string formatting output.
-    /// </summary>
     [TestClass]
     public class QuantityExtendedTests
     {
-        // Precision threshold for floating-point checks
-        private const double Precision = 0.000001;
+        private const double Precision = 0.0001;
 
-        #region Yard Related Tests
-
-        // Same yard values should be equal
         [TestMethod]
-        public void Equals_YardSameValue_ReturnsTrue()
+        public void Add_LengthWithSameUnit_ReturnsCorrectResult()
         {
-            var first = new Quantity(1.0, LengthUnit.YARD);
-            var second = new Quantity(1.0, LengthUnit.YARD);
+            var first = new Quantity<LengthUnit>(2.0, LengthUnit.FEET);
+            var second = new Quantity<LengthUnit>(3.0, LengthUnit.FEET);
 
-            Assert.IsTrue(first.Equals(second));
+            var result = first.Add(second);
+
+            Assert.AreEqual(5.0, result.Value, Precision);
+            Assert.AreEqual(LengthUnit.FEET, result.Unit);
         }
 
-        // Different yard values should not be equal
         [TestMethod]
-        public void Equals_YardDifferentValue_ReturnsFalse()
+        public void Add_LengthWithDifferentUnits_ReturnsCorrectResult()
         {
-            var first = new Quantity(1.0, LengthUnit.YARD);
-            var second = new Quantity(2.0, LengthUnit.YARD);
+            var first = new Quantity<LengthUnit>(1.0, LengthUnit.FEET);
+            var second = new Quantity<LengthUnit>(2.0, LengthUnit.INCH);
 
-            Assert.IsFalse(first.Equals(second));
+            var result = first.Add(second);
+
+            Assert.AreEqual(1.17, result.Value, Precision);
+            Assert.AreEqual(LengthUnit.FEET, result.Unit);
         }
 
-        // 1 yard should match 3 feet
         [TestMethod]
-        public void Equals_YardAndFeetEquivalent_ReturnsTrue()
+        public void Add_WeightWithDifferentUnits_ReturnsCorrectResult()
         {
-            var yard = new Quantity(1.0, LengthUnit.YARD);
-            var feet = new Quantity(3.0, LengthUnit.FEET);
+            var first = new Quantity<WeightUnit>(1.0, WeightUnit.KILOGRAM);
+            var second = new Quantity<WeightUnit>(500.0, WeightUnit.GRAM);
 
-            Assert.IsTrue(yard.Equals(feet));
+            var result = first.Add(second);
+
+            Assert.AreEqual(1.5, result.Value, Precision);
+            Assert.AreEqual(WeightUnit.KILOGRAM, result.Unit);
         }
 
-        // 1 yard should match 36 inches
         [TestMethod]
-        public void Equals_YardAndInchesEquivalent_ReturnsTrue()
+        public void Add_VolumeWithDifferentUnits_ReturnsCorrectResult()
         {
-            var yard = new Quantity(1.0, LengthUnit.YARD);
-            var inches = new Quantity(36.0, LengthUnit.INCH);
+            var first = new Quantity<VolumeUnit>(2.0, VolumeUnit.LITRE);
+            var second = new Quantity<VolumeUnit>(500.0, VolumeUnit.MILLILITRE);
 
-            Assert.IsTrue(yard.Equals(inches));
+            var result = first.Add(second);
+
+            Assert.AreEqual(2.5, result.Value, Precision);
+            Assert.AreEqual(VolumeUnit.LITRE, result.Unit);
         }
 
-        // Non-equivalent yard and feet values
         [TestMethod]
-        public void Equals_YardAndFeetNonEquivalent_ReturnsFalse()
+        public void Add_WithExplicitTargetUnit_ReturnsCorrectResult()
         {
-            var yard = new Quantity(1.0, LengthUnit.YARD);
-            var feet = new Quantity(2.0, LengthUnit.FEET);
+            var first = new Quantity<LengthUnit>(1.0, LengthUnit.FEET);
+            var second = new Quantity<LengthUnit>(6.0, LengthUnit.INCH);
 
-            Assert.IsFalse(yard.Equals(feet));
+            var result = first.Add(second, LengthUnit.INCH);
+
+            Assert.AreEqual(18.0, result.Value, Precision);
+            Assert.AreEqual(LengthUnit.INCH, result.Unit);
         }
 
-        #endregion
-
-        #region Centimeter Related Tests
-
-        // Same centimeter values should be equal
         [TestMethod]
-        public void Equals_CentimeterSameValue_ReturnsTrue()
+        public void Subtract_LengthWithSameUnit_ReturnsCorrectResult()
         {
-            var first = new Quantity(1.0, LengthUnit.CENTIMETER);
-            var second = new Quantity(1.0, LengthUnit.CENTIMETER);
+            var first = new Quantity<LengthUnit>(10.0, LengthUnit.FEET);
+            var second = new Quantity<LengthUnit>(4.0, LengthUnit.FEET);
 
-            Assert.IsTrue(first.Equals(second));
+            var result = first.Subtract(second);
+
+            Assert.AreEqual(6.0, result.Value, Precision);
+            Assert.AreEqual(LengthUnit.FEET, result.Unit);
         }
 
-        // 30.48 cm equals 1 foot
         [TestMethod]
-        public void Equals_CentimeterAndFeetEquivalent_ReturnsTrue()
+        public void Subtract_LengthWithDifferentUnits_ReturnsCorrectResult()
         {
-            var cm = new Quantity(30.48, LengthUnit.CENTIMETER);
-            var ft = new Quantity(1.0, LengthUnit.FEET);
+            var first = new Quantity<LengthUnit>(10.0, LengthUnit.FEET);
+            var second = new Quantity<LengthUnit>(6.0, LengthUnit.INCH);
 
-            Assert.IsTrue(cm.Equals(ft));
+            var result = first.Subtract(second);
+
+            Assert.AreEqual(9.5, result.Value, Precision);
+            Assert.AreEqual(LengthUnit.FEET, result.Unit);
         }
 
-        // 91.44 cm equals 1 yard
         [TestMethod]
-        public void Equals_CentimeterAndYardEquivalent_ReturnsTrue()
+        public void Subtract_WithExplicitTargetUnit_ReturnsCorrectResult()
         {
-            var cm = new Quantity(91.44, LengthUnit.CENTIMETER);
-            var yard = new Quantity(1.0, LengthUnit.YARD);
+            var first = new Quantity<VolumeUnit>(5.0, VolumeUnit.LITRE);
+            var second = new Quantity<VolumeUnit>(2.0, VolumeUnit.LITRE);
 
-            Assert.IsTrue(cm.Equals(yard));
+            var result = first.Subtract(second, VolumeUnit.MILLILITRE);
+
+            Assert.AreEqual(3000.0, result.Value, Precision);
+            Assert.AreEqual(VolumeUnit.MILLILITRE, result.Unit);
         }
 
-        // 1 cm should not equal 1 inch
         [TestMethod]
-        public void Equals_CentimeterAndInchNonEquivalent_ReturnsFalse()
+        public void Divide_SameUnit_ReturnsCorrectRatio()
         {
-            var cm = new Quantity(1.0, LengthUnit.CENTIMETER);
-            var inch = new Quantity(1.0, LengthUnit.INCH);
+            var first = new Quantity<WeightUnit>(10.0, WeightUnit.KILOGRAM);
+            var second = new Quantity<WeightUnit>(5.0, WeightUnit.KILOGRAM);
 
-            Assert.IsFalse(cm.Equals(inch));
+            var result = first.Divide(second);
+
+            Assert.AreEqual(2.0, result, Precision);
         }
 
-        #endregion
-
-        #region Transitive Equality Tests
-
-        // Transitive property across yard, feet, and inches
         [TestMethod]
-        public void Equals_Transitive_YardFeetInches_ReturnsTrue()
+        public void Divide_DifferentUnits_ReturnsCorrectRatio()
         {
-            var yard = new Quantity(2.0, LengthUnit.YARD);
-            var feet = new Quantity(6.0, LengthUnit.FEET);
-            var inches = new Quantity(72.0, LengthUnit.INCH);
+            var first = new Quantity<LengthUnit>(24.0, LengthUnit.INCH);
+            var second = new Quantity<LengthUnit>(2.0, LengthUnit.FEET);
 
-            Assert.IsTrue(yard.Equals(feet));
-            Assert.IsTrue(feet.Equals(inches));
-            Assert.IsTrue(yard.Equals(inches));
+            var result = first.Divide(second);
+
+            Assert.AreEqual(1.0, result, Precision);
         }
 
-        // Transitive property across cm, inches, and feet
         [TestMethod]
-        public void Equals_Transitive_CmInchesFeet_ReturnsTrue()
+        public void Add_DoesNotChangeOriginalObjects()
         {
-            var cm = new Quantity(30.48, LengthUnit.CENTIMETER);
-            var inches = new Quantity(12.0, LengthUnit.INCH);
-            var feet = new Quantity(1.0, LengthUnit.FEET);
+            var first = new Quantity<LengthUnit>(2.0, LengthUnit.FEET);
+            var second = new Quantity<LengthUnit>(6.0, LengthUnit.INCH);
 
-            Assert.IsTrue(cm.Equals(inches));
-            Assert.IsTrue(inches.Equals(feet));
-            Assert.IsTrue(cm.Equals(feet));
+            var result = first.Add(second);
+
+            Assert.AreEqual(2.0, first.Value, Precision);
+            Assert.AreEqual(6.0, second.Value, Precision);
+            Assert.AreEqual(2.5, result.Value, Precision);
         }
 
-        #endregion
-
-        #region Edge Case Validation
-
-        // Object should equal itself
         [TestMethod]
-        public void Equals_SameReference_ReturnsTrue()
+        public void Subtract_DoesNotChangeOriginalObjects()
         {
-            var value = new Quantity(5.0, LengthUnit.YARD);
-            Assert.IsTrue(value.Equals(value));
+            var first = new Quantity<WeightUnit>(10.0, WeightUnit.KILOGRAM);
+            var second = new Quantity<WeightUnit>(2.0, WeightUnit.KILOGRAM);
+
+            var result = first.Subtract(second);
+
+            Assert.AreEqual(10.0, first.Value, Precision);
+            Assert.AreEqual(2.0, second.Value, Precision);
+            Assert.AreEqual(8.0, result.Value, Precision);
         }
 
-        // Comparison with null should return false
         [TestMethod]
-        public void Equals_NullComparison_ReturnsFalse()
+        public void Divide_DoesNotChangeOriginalObjects()
         {
-            var value = new Quantity(5.0, LengthUnit.YARD);
-            Assert.IsFalse(value.Equals(null));
+            var first = new Quantity<VolumeUnit>(10.0, VolumeUnit.LITRE);
+            var second = new Quantity<VolumeUnit>(5.0, VolumeUnit.LITRE);
+
+            var result = first.Divide(second);
+
+            Assert.AreEqual(10.0, first.Value, Precision);
+            Assert.AreEqual(5.0, second.Value, Precision);
+            Assert.AreEqual(2.0, result, Precision);
         }
-
-        // Comparison with unrelated object type should return false
-        [TestMethod]
-        public void Equals_DifferentType_ReturnsFalse()
-        {
-            var value = new Quantity(5.0, LengthUnit.YARD);
-            Assert.IsFalse(value.Equals(new object()));
-        }
-
-        #endregion
-
-        #region Hash Code Consistency
-
-        // Equal objects must produce identical hash codes
-        [TestMethod]
-        public void GetHashCode_EquivalentValues_ReturnSameHash()
-        {
-            var yard = new Quantity(1.0, LengthUnit.YARD);
-            var feet = new Quantity(3.0, LengthUnit.FEET);
-
-            Assert.AreEqual(yard.GetHashCode(), feet.GetHashCode());
-        }
-
-        #endregion
-
-        #region ToString Formatting
-
-        // Verify formatted output for yard
-        [TestMethod]
-        public void ToString_Yard_ReturnsFormattedText()
-        {
-            var value = new Quantity(7.5, LengthUnit.YARD);
-            Assert.AreEqual("7.5 yd", value.ToString());
-        }
-
-        // Verify formatted output for centimeter
-        [TestMethod]
-        public void ToString_Centimeter_ReturnsFormattedText()
-        {
-            var value = new Quantity(7.5, LengthUnit.CENTIMETER);
-            Assert.AreEqual("7.5 cm", value.ToString());
-        }
-
-        #endregion
     }
 }

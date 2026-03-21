@@ -1,11 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "qvJVJWc0rvk=",
+  "dgSpecHash": "Lt7rAEmD9EQ=",
   "success": true,
   "projectFilePath": "C:\\Users\\Divyanshu Dev\\OneDrive\\Desktop\\Muskan\\QuantityMeasurementApp\\QuantityMeasurementAppRepositoryLayer\\QuantityMeasurementAppRepositoryLayer.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\Divyanshu Dev\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.1\\microsoft.aspnetcore.openapi.10.0.1.nupkg.sha512",
-    "C:\\Users\\Divyanshu Dev\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
-  ],
+  "expectedPackageFiles": [],
   "logs": []
 }

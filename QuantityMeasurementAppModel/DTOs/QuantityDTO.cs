@@ -1,6 +1,6 @@
-namespace QuantityMeasurementAppModel.Entity
+namespace QuantityMeasurementAppModel.DTOs
 {
-    public class QuantityMeasurementEntity
+    public class QuantityDTO
     {
         public int Id { get; set; }
         public double Value { get; set; }

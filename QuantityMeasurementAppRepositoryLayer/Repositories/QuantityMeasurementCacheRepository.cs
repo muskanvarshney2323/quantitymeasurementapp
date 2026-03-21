@@ -1,57 +1,30 @@
 using System.Collections.Generic;
-using System.Linq;
-using QuantityMeasurementAppModel.Entity;
+using QuantityMeasurementAppModel;
 
-namespace QuantityMeasurementAppRepositoryLayer.Repositories
+namespace QuantityMeasurementAppRepositoryLayer
 {
     public class QuantityMeasurementCacheRepository : IQuantityMeasurementRepository
     {
-        private readonly List<QuantityMeasurementEntity> _quantities = new List<QuantityMeasurementEntity>();
-        private int _nextId = 1;
+        private readonly List<QuantityMeasurementEntity> measurements = new List<QuantityMeasurementEntity>();
 
-        public string AddQuantity(QuantityMeasurementEntity entity)
+        public void Save(QuantityMeasurementEntity entity)
         {
-            entity.Id = _nextId++;
-            _quantities.Add(entity);
-            return "Quantity added successfully.";
+            measurements.Add(entity);
         }
 
-        public List<QuantityMeasurementEntity> GetAllQuantities()
+        public List<QuantityMeasurementEntity> GetAll()
         {
-            return _quantities;
+            return new List<QuantityMeasurementEntity>(measurements);
         }
 
-        public QuantityMeasurementEntity GetQuantityById(int id)
+        public int GetCount()
         {
-            return _quantities.FirstOrDefault(q => q.Id == id);
+            return measurements.Count;
         }
 
-        public string UpdateQuantity(QuantityMeasurementEntity entity)
+        public void DeleteAll()
         {
-            QuantityMeasurementEntity existingEntity = _quantities.FirstOrDefault(q => q.Id == entity.Id);
-
-            if (existingEntity == null)
-            {
-                return "Quantity not found.";
-            }
-
-            existingEntity.Value = entity.Value;
-            existingEntity.Unit = entity.Unit;
-
-            return "Quantity updated successfully.";
-        }
-
-        public string DeleteQuantity(int id)
-        {
-            QuantityMeasurementEntity existingEntity = _quantities.FirstOrDefault(q => q.Id == id);
-
-            if (existingEntity == null)
-            {
-                return "Quantity not found.";
-            }
-
-            _quantities.Remove(existingEntity);
-            return "Quantity deleted successfully.";
+            measurements.Clear();
         }
     }
 }

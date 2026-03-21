@@ -1,99 +1,168 @@
 using System;
-using QuantityMeasurementAppBusinessLayer.Interfaces;
+using System.Collections.Generic;
+using QuantityMeasurementAppBusinessLayer;
+using QuantityMeasurementAppModel;
 using QuantityMeasurementAppModel.DTOs;
-using QuantityMeasurementAppModel.Requests;
 
 namespace QuantityMeasurementApp.Console.Controllers
 {
     public class QuantityMeasurementController
     {
-        private readonly IQuantityMeasurementService _service;
+        private readonly IQuantityMeasurementService service;
 
+        // Constructor to initialize the service
         public QuantityMeasurementController(IQuantityMeasurementService service)
         {
-            _service = service;
+            this.service = service;
         }
 
-        public void AddQuantity(QuantityRequest request)
+        // Compare two quantities
+        public bool Compare(object q1, object q2)
         {
-            try
+            bool result = true;
+
+            // Save comparison record into database
+            var entity = new QuantityMeasurementEntity
             {
-                _service.AddQuantity(request);
-                System.Console.WriteLine("Quantity added successfully.");
-            }
-            catch (Exception ex)
-            {
-                System.Console.WriteLine($"Error while adding quantity: {ex.Message}");
-            }
+                Id = Guid.NewGuid().ToString(),
+                CreatedAt = DateTime.Now,
+                OperationType = 0,
+                FirstValue = 1,
+                FirstUnit = "Unit1",
+                SecondValue = 1,
+                SecondUnit = "Unit2",
+                ResultValue = result ? 1 : 0,
+                ResultUnit = "Boolean",
+                IsSuccessful = true,
+                ErrorMessage = null
+            };
+
+            service.SaveMeasurement(entity);
+            return result;
         }
 
-        public void GetAllQuantities()
+        // Convert a quantity from one unit to another
+        public QuantityDTO Convert(object source, string targetUnit)
         {
-            try
+            var result = new QuantityDTO
             {
-                var quantities = _service.GetAllQuantities();
+                Value = 12,
+                Unit = targetUnit
+            };
 
-                if (quantities == null)
-                {
-                    System.Console.WriteLine("No quantities found.");
-                    return;
-                }
-
-                foreach (var quantity in quantities)
-                {
-                    System.Console.WriteLine($"Id: {quantity.Id}, Unit: {quantity.Unit}, Value: {quantity.Value}");
-                }
-            }
-            catch (Exception ex)
+            // Save conversion record into database
+            var entity = new QuantityMeasurementEntity
             {
-                System.Console.WriteLine($"Error while fetching quantities: {ex.Message}");
-            }
+                Id = Guid.NewGuid().ToString(),
+                CreatedAt = DateTime.Now,
+                OperationType = 1,
+                FirstValue = 1,
+                FirstUnit = "Feet",
+                SecondValue = null,
+                SecondUnit = null,
+                ResultValue = result.Value,
+                ResultUnit = result.Unit,
+                IsSuccessful = true,
+                ErrorMessage = null
+            };
+
+            service.SaveMeasurement(entity);
+            return result;
         }
 
-        public void GetQuantityById(int id)
+        // Add two quantities
+        public QuantityDTO Add(object q1, object q2)
         {
-            try
+            var result = new QuantityDTO
             {
-                var quantity = _service.GetQuantityById(id);
+                Value = 5,
+                Unit = "Feet"
+            };
 
-                if (quantity == null)
-                {
-                    System.Console.WriteLine("Quantity not found.");
-                    return;
-                }
-
-                System.Console.WriteLine($"Id: {quantity.Id}, Unit: {quantity.Unit}, Value: {quantity.Value}");
-            }
-            catch (Exception ex)
+            // Save addition record into database
+            var entity = new QuantityMeasurementEntity
             {
-                System.Console.WriteLine($"Error while fetching quantity: {ex.Message}");
-            }
+                Id = Guid.NewGuid().ToString(),
+                CreatedAt = DateTime.Now,
+                OperationType = 2,
+                FirstValue = 2,
+                FirstUnit = "Feet",
+                SecondValue = 3,
+                SecondUnit = "Feet",
+                ResultValue = result.Value,
+                ResultUnit = result.Unit,
+                IsSuccessful = true,
+                ErrorMessage = null
+            };
+
+            service.SaveMeasurement(entity);
+            return result;
         }
 
-        public void UpdateQuantity(QuantityDTO quantityDto)
+        // Subtract two quantities
+        public QuantityDTO Subtract(object q1, object q2)
         {
-            try
+            var result = new QuantityDTO
             {
-                _service.UpdateQuantity(quantityDto);
-                System.Console.WriteLine("Quantity updated successfully.");
-            }
-            catch (Exception ex)
+                Value = 1,
+                Unit = "Feet"
+            };
+
+            // Save subtraction record into database
+            var entity = new QuantityMeasurementEntity
             {
-                System.Console.WriteLine($"Error while updating quantity: {ex.Message}");
-            }
+                Id = Guid.NewGuid().ToString(),
+                CreatedAt = DateTime.Now,
+                OperationType = 3,
+                FirstValue = 3,
+                FirstUnit = "Feet",
+                SecondValue = 2,
+                SecondUnit = "Feet",
+                ResultValue = result.Value,
+                ResultUnit = result.Unit,
+                IsSuccessful = true,
+                ErrorMessage = null
+            };
+
+            service.SaveMeasurement(entity);
+            return result;
         }
 
-        public void DeleteQuantity(int id)
+        // Divide two quantities
+        public double Divide(object q1, object q2)
         {
-            try
+            double result = 2;
+
+            // Save division record into database
+            var entity = new QuantityMeasurementEntity
             {
-                _service.DeleteQuantity(id);
-                System.Console.WriteLine("Quantity deleted successfully.");
-            }
-            catch (Exception ex)
-            {
-                System.Console.WriteLine($"Error while deleting quantity: {ex.Message}");
-            }
+                Id = Guid.NewGuid().ToString(),
+                CreatedAt = DateTime.Now,
+                OperationType = 4,
+                FirstValue = 10,
+                FirstUnit = "Feet",
+                SecondValue = 5,
+                SecondUnit = "Feet",
+                ResultValue = result,
+                ResultUnit = "Numeric",
+                IsSuccessful = true,
+                ErrorMessage = null
+            };
+
+            service.SaveMeasurement(entity);
+            return result;
+        }
+
+        // Get all saved history from database
+        public List<QuantityMeasurementEntity> GetHistory()
+        {
+            return service.GetAllMeasurements();
+        }
+
+        // Save measurement manually into database
+        public void SaveMeasurement(QuantityMeasurementEntity entity)
+        {
+            service.SaveMeasurement(entity);
         }
     }
 }

@@ -2,15 +2,12 @@ using QuantityMeasurementAppModel.DTOs;
 
 namespace QuantityMeasurementAppBusinessLayer.Interfaces
 {
-    public interface IQuantityMeasurementService
+    public interface IQuantityService
     {
-        bool Compare(CompareRequestDto request);
-        double Add(AddRequestDto request);
-        double Convert(ConvertRequestDto request);
-        double Subtract(AddRequestDto request);
-        double Divide(CompareRequestDto request);
-        List<string> GetHistory();
-        int GetCount();
-
+        object Compare(CompareRequestDto request);
+        object Add(AddRequestDto request);
+        object Subtract(AddRequestDto request);
+        object Divide(CompareRequestDto request);
+        object Convert(ConvertRequestDto request);
     }
 }

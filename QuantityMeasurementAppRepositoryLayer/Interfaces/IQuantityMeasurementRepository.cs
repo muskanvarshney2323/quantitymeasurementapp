@@ -1,13 +1,16 @@
+using QuantityMeasurementAppModel.DTOs;
 using System.Collections.Generic;
-using QuantityMeasurementAppModel;
 
-namespace QuantityMeasurementAppRepositoryLayer
+namespace QuantityMeasurementAppRepositoryLayer.Interfaces
 {
     public interface IQuantityMeasurementRepository
     {
-        void Save(QuantityMeasurementEntity entity);
-        List<QuantityMeasurementEntity> GetAll();
+        bool Compare(CompareRequestDto request);
+        double Add(AddRequestDto request);
+        double Convert(ConvertRequestDto request);
+        double Subtract(AddRequestDto request);
+        double Divide(CompareRequestDto request);
+        List<string> GetHistory();
         int GetCount();
-        void DeleteAll();
     }
 }

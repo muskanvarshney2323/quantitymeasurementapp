@@ -1,131 +1,83 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Data.SqlClient;
+using QuantityMeasurementAppModel.DTOs;
+using QuantityMeasurementAppRepositoryLayer.Interfaces;
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
-using QuantityMeasurementAppModel;
-using QuantityMeasurementAppRepositoryLayer;
 
 namespace QuantityMeasurementAppRepositoryLayer.Repositories
 {
-    public class QuantityMeasurementDbRepository : IQuantityMeasurementRepository
+    public class QuantityMeasurementDatabaseRepository : IQuantityMeasurementRepository
     {
-        private readonly string connectionString;
+        private readonly string _connectionString;
 
-        public QuantityMeasurementDbRepository()
+        public QuantityMeasurementDatabaseRepository(IConfiguration configuration)
         {
-            connectionString = "Server=localhost,1433;Database=QuantityMeasurementDB;User Id=sa;Password=Sql@123456;TrustServerCertificate=True;";
+            _connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new Exception("DefaultConnection not found in appsettings.json");
         }
 
-        public void Save(QuantityMeasurementEntity entity)
+        public bool Compare(QuantityMeasurementAppModel.DTOs.CompareRequestDto request)
         {
-            using SqlConnection connection = new SqlConnection(connectionString);
-
-            string query = @"
-                INSERT INTO MeasurementRecords
-                (
-                    Id,
-                    TimeStamp,
-                    Operation,
-                    Input1Value,
-                    Input1Unit,
-                    Input2Value,
-                    Input2Unit,
-                    OutputValue,
-                    OutputUnit,
-                    SuccessFlag,
-                    ErrorMessage
-                )
-                VALUES
-                (
-                    @Id,
-                    @TimeStamp,
-                    @Operation,
-                    @Input1Value,
-                    @Input1Unit,
-                    @Input2Value,
-                    @Input2Unit,
-                    @OutputValue,
-                    @OutputUnit,
-                    @SuccessFlag,
-                    @ErrorMessage
-                )";
-
-            using SqlCommand command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@Id", entity.Id ?? Guid.NewGuid().ToString());
-            command.Parameters.AddWithValue("@TimeStamp", entity.CreatedAt == default ? DateTime.Now : entity.CreatedAt);
-            command.Parameters.AddWithValue("@Operation", entity.OperationType);
-
-            command.Parameters.AddWithValue("@Input1Value", (object?)entity.FirstValue ?? DBNull.Value);
-            command.Parameters.AddWithValue("@Input1Unit", (object?)entity.FirstUnit ?? DBNull.Value);
-
-            command.Parameters.AddWithValue("@Input2Value", (object?)entity.SecondValue ?? DBNull.Value);
-            command.Parameters.AddWithValue("@Input2Unit", (object?)entity.SecondUnit ?? DBNull.Value);
-
-            command.Parameters.AddWithValue("@OutputValue", (object?)entity.ResultValue ?? DBNull.Value);
-            command.Parameters.AddWithValue("@OutputUnit", (object?)entity.ResultUnit ?? DBNull.Value);
-
-            command.Parameters.AddWithValue("@SuccessFlag", entity.IsSuccessful);
-            command.Parameters.AddWithValue("@ErrorMessage", (object?)entity.ErrorMessage ?? DBNull.Value);
-
-            connection.Open();
-            command.ExecuteNonQuery();
+            // Actual compare logic Business layer me hona chahiye
+            // Repository me abhi sirf placeholder return
+            return false;
         }
 
-        public List<QuantityMeasurementEntity> GetAll()
+        public double Add(QuantityMeasurementAppModel.DTOs.AddRequestDto request)
         {
-            List<QuantityMeasurementEntity> records = new List<QuantityMeasurementEntity>();
+            // Actual add logic Business layer me hona chahiye
+            return 0;
+        }
 
-            using SqlConnection connection = new SqlConnection(connectionString);
-            string query = "SELECT * FROM MeasurementRecords ORDER BY TimeStamp DESC";
+        public double Convert(QuantityMeasurementAppModel.DTOs.ConvertRequestDto request)
+        {
+            // Actual convert logic Business layer me hona chahiye
+            return 0;
+        }
+
+        public List<string> GetHistory()
+        {
+            List<string> history = new List<string>();
+
+            using SqlConnection connection = new SqlConnection(_connectionString);
+            string query = "SELECT OutputText FROM MeasurementRecords ORDER BY Timestamp DESC";
 
             using SqlCommand command = new SqlCommand(query, connection);
             connection.Open();
 
             using SqlDataReader reader = command.ExecuteReader();
-
             while (reader.Read())
             {
-                QuantityMeasurementEntity entity = new QuantityMeasurementEntity
-                {
-                    Id = reader["Id"]?.ToString(),
-                    CreatedAt = Convert.ToDateTime(reader["TimeStamp"]),
-                    OperationType = Convert.ToInt32(reader["Operation"]),
-                    FirstValue = reader["Input1Value"] == DBNull.Value ? null : Convert.ToDouble(reader["Input1Value"]),
-                    FirstUnit = reader["Input1Unit"] == DBNull.Value ? null : reader["Input1Unit"].ToString(),
-                    SecondValue = reader["Input2Value"] == DBNull.Value ? null : Convert.ToDouble(reader["Input2Value"]),
-                    SecondUnit = reader["Input2Unit"] == DBNull.Value ? null : reader["Input2Unit"].ToString(),
-                    ResultValue = reader["OutputValue"] == DBNull.Value ? null : Convert.ToDouble(reader["OutputValue"]),
-                    ResultUnit = reader["OutputUnit"] == DBNull.Value ? null : reader["OutputUnit"].ToString(),
-                    IsSuccessful = Convert.ToBoolean(reader["SuccessFlag"]),
-                    ErrorMessage = reader["ErrorMessage"] == DBNull.Value ? null : reader["ErrorMessage"].ToString()
-                };
-
-                records.Add(entity);
+                history.Add(reader["OutputText"]?.ToString() ?? string.Empty);
             }
 
-            return records;
+            return history;
         }
 
         public int GetCount()
         {
-            using SqlConnection connection = new SqlConnection(connectionString);
+            using SqlConnection connection = new SqlConnection(_connectionString);
             string query = "SELECT COUNT(*) FROM MeasurementRecords";
 
             using SqlCommand command = new SqlCommand(query, connection);
             connection.Open();
 
-            return Convert.ToInt32(command.ExecuteScalar());
+            return System.Convert.ToInt32(command.ExecuteScalar());
+        }
+        public double Subtract(AddRequestDto request)
+        {
+            return request.Value1 - request.Value2;
         }
 
-        public void DeleteAll()
+        public double Divide(CompareRequestDto request)
         {
-            using SqlConnection connection = new SqlConnection(connectionString);
-            string query = "DELETE FROM MeasurementRecords";
+            if (request.Value2 == 0)
+            {
+                throw new DivideByZeroException("Cannot divide by zero.");
+            }
 
-            using SqlCommand command = new SqlCommand(query, connection);
-            connection.Open();
-
-            command.ExecuteNonQuery();
+            return request.Value1 / request.Value2;
         }
     }
 }

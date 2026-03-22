@@ -1,0 +1,13 @@
+USE QuantityMeasurementDB;
+GO
+
+CREATE TABLE Users
+(
+    Id NVARCHAR(50) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(100) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(MAX) NULL,
+    IsGoogleUser BIT NOT NULL,
+    CreatedAt DATETIME2 NOT NULL
+);
+GO

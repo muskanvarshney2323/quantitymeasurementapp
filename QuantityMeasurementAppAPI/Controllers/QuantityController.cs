@@ -1,66 +1,52 @@
 using Microsoft.AspNetCore.Mvc;
-using QuantityMeasurementAppBusinessLayer.Interfaces;
 using QuantityMeasurementAppModel.DTOs;
+using QuantityMeasurementAppBusinessLayer.Interfaces;
 
 namespace QuantityMeasurementAppAPI.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class QuantityController : ControllerBase
     {
-        private readonly IQuantityMeasurementService _service;
+        private readonly IQuantityService _quantityService;
 
-        public QuantityController(IQuantityMeasurementService service)
+        public QuantityController(IQuantityService quantityService)
         {
-            _service = service;
+            _quantityService = quantityService;
         }
 
         [HttpPost("compare")]
         public IActionResult Compare([FromBody] CompareRequestDto request)
         {
-            var result = _service.Compare(request);
+            var result = _quantityService.Compare(request);
             return Ok(result);
         }
 
         [HttpPost("add")]
         public IActionResult Add([FromBody] AddRequestDto request)
         {
-            var result = _service.Add(request);
+            var result = _quantityService.Add(request);
             return Ok(result);
         }
 
         [HttpPost("subtract")]
         public IActionResult Subtract([FromBody] AddRequestDto request)
         {
-            var result = _service.Subtract(request);
+            var result = _quantityService.Subtract(request);
             return Ok(result);
         }
 
         [HttpPost("divide")]
         public IActionResult Divide([FromBody] CompareRequestDto request)
         {
-            var result = _service.Divide(request);
+            var result = _quantityService.Divide(request);
             return Ok(result);
         }
 
         [HttpPost("convert")]
         public IActionResult Convert([FromBody] ConvertRequestDto request)
         {
-            var result = _service.Convert(request);
-            return Ok(result);
-        }
-
-        [HttpGet("history")]
-        public IActionResult GetHistory()
-        {
-            var result = _service.GetHistory();
-            return Ok(result);
-        }
-
-        [HttpGet("count")]
-        public IActionResult GetCount()
-        {
-            var result = _service.GetCount();
+            var result = _quantityService.Convert(request);
             return Ok(result);
         }
     }

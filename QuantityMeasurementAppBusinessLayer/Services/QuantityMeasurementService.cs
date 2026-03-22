@@ -1,36 +1,61 @@
-using System.Collections.Generic;
-using QuantityMeasurementAppModel;
-using QuantityMeasurementAppRepositoryLayer;
+using QuantityMeasurementAppBusinessLayer.Interfaces;
+using QuantityMeasurementAppRepositoryLayer.Interfaces;
+using QuantityMeasurementAppModel.DTOs;
 
-namespace QuantityMeasurementAppBusinessLayer
+namespace QuantityMeasurementAppBusinessLayer.Services
 {
     public class QuantityMeasurementService : IQuantityMeasurementService
     {
-        private readonly IQuantityMeasurementRepository repository;
+        private readonly IQuantityMeasurementRepository _quantityMeasurementRepository;
 
-        public QuantityMeasurementService(IQuantityMeasurementRepository repository)
+        public QuantityMeasurementService(IQuantityMeasurementRepository quantityMeasurementRepository)
         {
-            this.repository = repository;
+            _quantityMeasurementRepository = quantityMeasurementRepository;
         }
 
-        public void SaveMeasurement(QuantityMeasurementEntity entity)
+        public bool Compare(CompareRequestDto request)
         {
-            repository.Save(entity);
+            return _quantityMeasurementRepository.Compare(request);
         }
 
-        public List<QuantityMeasurementEntity> GetAllMeasurements()
+        public double Add(AddRequestDto request)
         {
-            return repository.GetAll();
+            return _quantityMeasurementRepository.Add(request);
         }
 
-        public int GetTotalMeasurements()
+        public double Convert(ConvertRequestDto request)
         {
-            return repository.GetCount();
+            return _quantityMeasurementRepository.Convert(request);
         }
 
-        public void DeleteAllMeasurements()
+        public List<string> GetHistory()
         {
-            repository.DeleteAll();
+            return _quantityMeasurementRepository.GetHistory();
+        }
+
+        public int GetCount()
+        {
+            return _quantityMeasurementRepository.GetCount();
+        }
+        public double Subtract(AddRequestDto request)
+        {
+            double value1 = request.Value1;
+            double value2 = request.Value2;
+
+            return value1 - value2;
+        }
+
+        public double Divide(CompareRequestDto request)
+        {
+            double value1 = request.Value1;
+            double value2 = request.Value2;
+
+            if (value2 == 0)
+            {
+                throw new DivideByZeroException("Cannot divide by zero.");
+            }
+
+            return value1 / value2;
         }
     }
 }

@@ -1,13 +1,16 @@
-using System.Collections.Generic;
-using QuantityMeasurementAppModel;
+using QuantityMeasurementAppModel.DTOs;
 
-namespace QuantityMeasurementAppBusinessLayer
+namespace QuantityMeasurementAppBusinessLayer.Interfaces
 {
     public interface IQuantityMeasurementService
     {
-        void SaveMeasurement(QuantityMeasurementEntity entity);
-        List<QuantityMeasurementEntity> GetAllMeasurements();
-        int GetTotalMeasurements();
-        void DeleteAllMeasurements();
+        bool Compare(CompareRequestDto request);
+        double Add(AddRequestDto request);
+        double Convert(ConvertRequestDto request);
+        double Subtract(AddRequestDto request);
+        double Divide(CompareRequestDto request);
+        List<string> GetHistory();
+        int GetCount();
+
     }
 }

@@ -19,20 +19,19 @@ namespace QuantityMeasurementAppRepositoryLayer.Repositories
 
         public bool Compare(QuantityMeasurementAppModel.DTOs.CompareRequestDto request)
         {
-            // Actual compare logic Business layer me hona chahiye
-            // Repository me abhi sirf placeholder return
+           
             return false;
         }
 
         public double Add(QuantityMeasurementAppModel.DTOs.AddRequestDto request)
         {
-            // Actual add logic Business layer me hona chahiye
+            
             return 0;
         }
 
         public double Convert(QuantityMeasurementAppModel.DTOs.ConvertRequestDto request)
         {
-            // Actual convert logic Business layer me hona chahiye
+
             return 0;
         }
 

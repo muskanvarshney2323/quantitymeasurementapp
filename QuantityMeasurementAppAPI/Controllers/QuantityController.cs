@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using QuantityMeasurementAppBusinessLayer.Interfaces;
 using QuantityMeasurementAppModel.DTOs;
+using System;
+using System.Linq;
+using QuantityMeasurementAppModel.Enums;
 
 namespace QuantityMeasurementAppAPI.Controllers
 {
@@ -62,6 +65,45 @@ namespace QuantityMeasurementAppAPI.Controllers
         {
             var result = _service.GetCount();
             return Ok(result);
+        }
+        [HttpGet("operationtype")]
+        public IActionResult GetOperationTypes()
+        {
+            var result = Enum.GetValues(typeof(OperationType))
+                             .Cast<OperationType>()
+                             .Select(x => new
+                             {
+                                 Id = (int)x,
+                                 Name = x.ToString()
+                             })
+                             .ToList();
+
+            return Ok(new
+            {
+                Success = true,
+                Message = "Operation types fetched successfully",
+                Data = result
+            });
+        }
+
+        [HttpGet("measurementtype")]
+        public IActionResult GetMeasurementTypes()
+        {
+            var result = Enum.GetValues(typeof(MeasurementType))
+                             .Cast<MeasurementType>()
+                             .Select(x => new
+                             {
+                                 Id = (int)x,
+                                 Name = x.ToString()
+                             })
+                             .ToList();
+
+            return Ok(new
+            {
+                Success = true,
+                Message = "Measurement types fetched successfully",
+                Data = result
+            });
         }
     }
 }

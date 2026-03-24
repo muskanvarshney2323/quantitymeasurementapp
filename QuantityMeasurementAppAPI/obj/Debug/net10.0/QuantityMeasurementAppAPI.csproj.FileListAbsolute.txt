@@ -73,3 +73,11 @@ C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMe
 C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppAPI\obj\Debug\net10.0\QuantityMeasurementAppAPI.pdb
 C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppAPI\obj\Debug\net10.0\QuantityMeasurementAppAPI.genruntimeconfig.cache
 C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppAPI\obj\Debug\net10.0\ref\QuantityMeasurementAppAPI.dll
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppAPI\bin\Debug\net10.0\BCrypt.Net-Next.dll
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppAPI\bin\Debug\net10.0\Google.Apis.dll
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppAPI\bin\Debug\net10.0\Google.Apis.Auth.dll
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppAPI\bin\Debug\net10.0\Google.Apis.Core.dll
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppAPI\bin\Debug\net10.0\Newtonsoft.Json.dll
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppAPI\bin\Debug\net10.0\System.CodeDom.dll
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppAPI\bin\Debug\net10.0\System.Management.dll
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppAPI\bin\Debug\net10.0\runtimes\win\lib\net7.0\System.Management.dll

@@ -1,11 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using QuantityMeasurementAppModel.DTOs;
 using QuantityMeasurementAppBusinessLayer.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Linq;
+using QuantityMeasurementAppModel.Enums;
 
 namespace QuantityMeasurementAppAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class QuantityController : ControllerBase
     {
         private readonly IQuantityService _quantityService;
@@ -48,6 +53,45 @@ namespace QuantityMeasurementAppAPI.Controllers
         {
             var result = _quantityService.Convert(request);
             return Ok(result);
+        }
+        [HttpGet("operationtype")]
+        public IActionResult GetOperationTypes()
+        {
+            var result = Enum.GetValues(typeof(OperationType))
+                             .Cast<OperationType>()
+                             .Select(x => new
+                             {
+                                 Id = (int)x,
+                                 Name = x.ToString()
+                             })
+                             .ToList();
+
+            return Ok(new
+            {
+                Success = true,
+                Message = "Operation types fetched successfully",
+                Data = result
+            });
+        }
+
+        [HttpGet("measurementtype")]
+        public IActionResult GetMeasurementTypes()
+        {
+            var result = Enum.GetValues(typeof(MeasurementType))
+                             .Cast<MeasurementType>()
+                             .Select(x => new
+                             {
+                                 Id = (int)x,
+                                 Name = x.ToString()
+                             })
+                             .ToList();
+
+            return Ok(new
+            {
+                Success = true,
+                Message = "Measurement types fetched successfully",
+                Data = result
+            });
         }
     }
 }

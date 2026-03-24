@@ -2,12 +2,11 @@ namespace QuantityMeasurementAppModel.Entities
 {
     public class User
     {
-        public int UserId { get; set; }
-        public string FullName { get; set; } = string.Empty;
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
         public string Role { get; set; } = "User";
-        public bool IsGoogleUser { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

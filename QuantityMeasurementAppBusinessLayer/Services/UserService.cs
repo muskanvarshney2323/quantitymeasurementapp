@@ -1,4 +1,3 @@
-using QuantityMeasurementAppBusinessLayer.Helpers;
 using QuantityMeasurementAppBusinessLayer.Interfaces;
 using QuantityMeasurementAppModel.DTOs;
 using QuantityMeasurementAppModel.Entities;
@@ -8,26 +7,17 @@ namespace QuantityMeasurementAppBusinessLayer.Services
 {
     public class UserService : IUserService
     {
-        private readonly IUserRepository _userRepository;
-        private readonly PasswordHelper _passwordHelper;
-        private readonly JwtTokenHelper _jwtTokenHelper;
-        private readonly GoogleTokenHelper _googleTokenHelper;
+        private readonly IUserRepository _repository;
 
-        public UserService(
-            IUserRepository userRepository,
-            PasswordHelper passwordHelper,
-            JwtTokenHelper jwtTokenHelper,
-            GoogleTokenHelper googleTokenHelper)
+        public UserService(IUserRepository repository)
         {
-            _userRepository = userRepository;
-            _passwordHelper = passwordHelper;
-            _jwtTokenHelper = jwtTokenHelper;
-            _googleTokenHelper = googleTokenHelper;
+            _repository = repository;
         }
 
-        public AuthResponseDto Register(RegisterDto registerDto)
+        public AuthResponseDto Register(RegisterDto dto)
         {
-            var existingUser = _userRepository.GetUserByEmail(registerDto.Email);
+            var existingUser = _repository.GetUserByEmail(dto.Email);
+
             if (existingUser != null)
             {
                 return new AuthResponseDto
@@ -39,103 +29,92 @@ namespace QuantityMeasurementAppBusinessLayer.Services
 
             var user = new User
             {
-                FullName = registerDto.FullName,
-                Email = registerDto.Email,
-                PasswordHash = _passwordHelper.HashPassword(registerDto.Password),
-                Role = "User",
-                IsGoogleUser = false,
-                CreatedAt = DateTime.UtcNow
+                Name = dto.Name,
+                Email = dto.Email,
+                PasswordHash = dto.Password,
+                Role = "User"
             };
 
-            var savedUser = _userRepository.AddUser(user);
-            var token = _jwtTokenHelper.GenerateToken(savedUser);
+            _repository.AddUser(user);
 
             return new AuthResponseDto
             {
                 Success = true,
-                Message = "Registration successful",
-                Token = token,
-                Email = savedUser.Email,
-                FullName = savedUser.FullName,
-                Role = savedUser.Role
+                Message = "User registered successfully",
+                Name = user.Name,
+                Email = user.Email
             };
         }
 
-        public AuthResponseDto Login(LoginDto loginDto)
+        public AuthResponseDto Login(LoginDto dto)
         {
-            var user = _userRepository.GetUserByEmail(loginDto.Email);
-            if (user == null)
+            var user = _repository.GetUserByEmail(dto.Email);
+
+            if (user == null || user.PasswordHash != dto.Password)
             {
                 return new AuthResponseDto
                 {
                     Success = false,
-                    Message = "Invalid email or password"
+                    Message = "Invalid credentials"
                 };
             }
-
-            var isValidPassword = _passwordHelper.VerifyPassword(loginDto.Password, user.PasswordHash);
-            if (!isValidPassword)
-            {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    Message = "Invalid email or password"
-                };
-            }
-
-            var token = _jwtTokenHelper.GenerateToken(user);
 
             return new AuthResponseDto
             {
                 Success = true,
                 Message = "Login successful",
-                Token = token,
+                Name = user.Name,
                 Email = user.Email,
-                FullName = user.FullName,
-                Role = user.Role
+                Token = "sample-jwt-token"
             };
         }
 
-        public async Task<AuthResponseDto> GoogleLoginAsync(GoogleLoginDto googleLoginDto)
+        public AuthResponseDto GoogleLogin(GoogleLoginDto dto)
         {
-            var payload = await _googleTokenHelper.VerifyGoogleTokenAsync(googleLoginDto.IdToken);
-
-            if (payload == null || string.IsNullOrWhiteSpace(payload.Email))
-            {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    Message = "Invalid Google token"
-                };
-            }
-
-            var user = _userRepository.GetUserByEmail(payload.Email);
+            var user = _repository.GetUserByEmail(dto.Email);
 
             if (user == null)
             {
                 user = new User
                 {
-                    FullName = payload.Name ?? "Google User",
-                    Email = payload.Email,
-                    PasswordHash = string.Empty,
-                    Role = "User",
-                    IsGoogleUser = true,
-                    CreatedAt = DateTime.UtcNow
+                    Name = dto.Name,
+                    Email = dto.Email,
+                    PasswordHash = "GoogleAuth",
+                    Role = "User"
                 };
 
-                user = _userRepository.AddUser(user);
+                _repository.AddUser(user);
             }
-
-            var token = _jwtTokenHelper.GenerateToken(user);
 
             return new AuthResponseDto
             {
                 Success = true,
                 Message = "Google login successful",
-                Token = token,
+                Name = user.Name,
                 Email = user.Email,
-                FullName = user.FullName,
-                Role = user.Role
+                Token = "sample-google-jwt-token"
+            };
+        }
+
+        public AuthResponseDto GetCurrentUser(string email)
+        {
+            var user = _repository.GetUserByEmail(email);
+
+            if (user == null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "User not found"
+                };
+            }
+
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = "User fetched successfully",
+                Name = user.Name,
+                Email = user.Email
             };
         }
     }

@@ -1,13 +1,18 @@
-using QuantityMeasurementAppModel.DTOs;
+using QuantityMeasurementAppModel.Entities;
 
 namespace QuantityMeasurementAppBusinessLayer.Interfaces
 {
-    public interface IQuantityService
+    public interface IQuantityMeasurementService
     {
-        object Compare(CompareRequestDto request);
-        object Add(AddRequestDto request);
-        object Subtract(AddRequestDto request);
-        object Divide(CompareRequestDto request);
-        object Convert(ConvertRequestDto request);
+        string Add(double value1, string unit1, double value2, string unit2, string quantityType);
+        string Subtract(double value1, string unit1, double value2, string unit2, string quantityType);
+        string Compare(double value1, string unit1, double value2, string unit2, string quantityType);
+        string Divide(double value1, string unit1, double value2, string unit2, string quantityType);
+        string Convert(double value, string fromUnit, string toUnit, string quantityType);
+
+        List<MeasurementRecord> GetHistory();
+        int GetCount();
+        List<string> GetOperationTypes();
+        List<string> GetMeasurementTypes();
     }
 }

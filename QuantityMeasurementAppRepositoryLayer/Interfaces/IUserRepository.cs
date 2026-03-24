@@ -5,6 +5,6 @@ namespace QuantityMeasurementAppRepositoryLayer.Interfaces
     public interface IUserRepository
     {
         User? GetUserByEmail(string email);
-        bool RegisterUser(User user);
+        User AddUser(User user);
     }
 }

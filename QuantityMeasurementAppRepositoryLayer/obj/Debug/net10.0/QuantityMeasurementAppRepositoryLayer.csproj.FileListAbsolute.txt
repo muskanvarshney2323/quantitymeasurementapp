@@ -14,3 +14,5 @@ C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMe
 C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppRepositoryLayer\obj\Debug\net10.0\refint\QuantityMeasurementAppRepositoryLayer.dll
 C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppRepositoryLayer\obj\Debug\net10.0\QuantityMeasurementAppRepositoryLayer.pdb
 C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppRepositoryLayer\obj\Debug\net10.0\ref\QuantityMeasurementAppRepositoryLayer.dll
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppRepositoryLayer\bin\Debug\net10.0\QuantityMeasurementAppRepositoryLayer.runtimeconfig.json
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppRepositoryLayer\obj\Debug\net10.0\QuantityMeasurementAppRepositoryLayer.genruntimeconfig.cache

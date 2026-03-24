@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>QuantityMeasurementAppAPI</name>
+    </assembly>
+    <members>
+        <member name="T:QuantityMeasurementAppAPI.Controllers.QuantityController">
+            <summary>
+            APIs for quantity measurement operations such as add, subtract, compare, divide, convert, and history.
+            </summary>
+        </member>
+        <member name="M:QuantityMeasurementAppAPI.Controllers.QuantityController.Add(QuantityMeasurementAppModel.DTOs.AddRequestDto)">
+            <summary>
+            Add two quantities.
+            </summary>
+            <param name="request">Input values, units, and quantity type.</param>
+            <returns>Returns the sum of the two quantities.</returns>
+        </member>
+        <member name="M:QuantityMeasurementAppAPI.Controllers.QuantityController.Subtract(QuantityMeasurementAppModel.DTOs.AddRequestDto)">
+            <summary>
+            Subtract one quantity from another.
+            </summary>
+            <param name="request">Input values, units, and quantity type.</param>
+            <returns>Returns the subtraction result.</returns>
+        </member>
+        <member name="M:QuantityMeasurementAppAPI.Controllers.QuantityController.Compare(QuantityMeasurementAppModel.DTOs.CompareRequestDto)">
+            <summary>
+            Compare two quantities.
+            </summary>
+            <param name="request">Input values, units, and quantity type.</param>
+            <returns>Returns which quantity is greater or if both are equal.</returns>
+        </member>
+        <member name="M:QuantityMeasurementAppAPI.Controllers.QuantityController.Divide(QuantityMeasurementAppModel.DTOs.AddRequestDto)">
+            <summary>
+            Divide one quantity by another.
+            </summary>
+            <param name="request">Input values, units, and quantity type.</param>
+            <returns>Returns the division result.</returns>
+        </member>
+        <member name="M:QuantityMeasurementAppAPI.Controllers.QuantityController.Convert(QuantityMeasurementAppModel.DTOs.ConvertRequestDto)">
+            <summary>
+            Convert a quantity from one unit to another.
+            </summary>
+            <param name="request">Input value, source unit, target unit, and quantity type.</param>
+            <returns>Returns the converted value.</returns>
+        </member>
+        <member name="M:QuantityMeasurementAppAPI.Controllers.QuantityController.GetHistory">
+            <summary>
+            Get complete history of measurement operations.
+            </summary>
+            <returns>Returns all stored quantity measurement records.</returns>
+        </member>
+        <member name="M:QuantityMeasurementAppAPI.Controllers.QuantityController.GetCount">
+            <summary>
+            Get total count of stored operations.
+            </summary>
+            <returns>Returns total number of saved operations.</returns>
+        </member>
+        <member name="M:QuantityMeasurementAppAPI.Controllers.QuantityController.GetOperationType">
+            <summary>
+            Get all supported operation types.
+            </summary>
+            <returns>Returns the list of supported operation types.</returns>
+        </member>
+        <member name="M:QuantityMeasurementAppAPI.Controllers.QuantityController.GetMeasurementType">
+            <summary>
+            Get all supported measurement types.
+            </summary>
+            <returns>Returns the list of supported measurement categories.</returns>
+        </member>
+        <member name="T:Program">
+            <summary>
+            Auto-generated public partial Program class for top-level statement apps.
+            </summary>
+        </member>
+    </members>
+</doc>

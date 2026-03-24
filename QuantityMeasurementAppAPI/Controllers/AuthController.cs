@@ -1,94 +1,90 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuantityMeasurementAppBusinessLayer.Interfaces;
 using QuantityMeasurementAppModel.DTOs;
-using System.Security.Claims;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace QuantityMeasurementAppAPI.Controllers
 {
+    /// <summary>
+    /// APIs for user authentication such as register, login, google login, and fetch current user.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IUserService _service;
 
-        public AuthController(IUserService userService)
+        public AuthController(IUserService service)
         {
-            _userService = userService;
+            _service = service;
         }
 
+        /// <summary>
+        /// Register a new user.
+        /// </summary>
+        /// <param name="dto">User registration details.</param>
+        /// <returns>Returns registration result.</returns>
         [HttpPost("register")]
-        [AllowAnonymous]
-        public IActionResult Register([FromBody] RegisterDto registerDto)
+        [SwaggerOperation(Summary = "Register user", Description = "Creates a new user account using name, email, and password.")]
+        public IActionResult Register([FromBody] RegisterDto dto)
         {
-            var response = _userService.Register(registerDto);
+            var result = _service.Register(dto);
 
-            if (!response.Success)
-            {
-                return BadRequest(response);
-            }
+            if (!result.Success)
+                return BadRequest(result);
 
-            return Ok(response);
+            return Ok(result);
         }
 
+        /// <summary>
+        /// Login an existing user.
+        /// </summary>
+        /// <param name="dto">User login credentials.</param>
+        /// <returns>Returns login result.</returns>
         [HttpPost("login")]
-        [AllowAnonymous]
-        public IActionResult Login([FromBody] LoginDto loginDto)
+        [SwaggerOperation(Summary = "Login user", Description = "Authenticates a user using email and password.")]
+        public IActionResult Login([FromBody] LoginDto dto)
         {
-            var response = _userService.Login(loginDto);
+            var result = _service.Login(dto);
 
-            if (!response.Success)
-            {
-                return Unauthorized(response);
-            }
+            if (!result.Success)
+                return BadRequest(result);
 
-            return Ok(response);
+            return Ok(result);
         }
 
-        [HttpGet("google-login")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GoogleLogin([FromQuery] GoogleLoginDto googleLoginDto)
+        /// <summary>
+        /// Login or register user using Google account.
+        /// </summary>
+        /// <param name="dto">Google user details.</param>
+        /// <returns>Returns google login result.</returns>
+        [HttpPost("google-login")]
+        [SwaggerOperation(Summary = "Google login", Description = "Logs in a user with Google account details. If user does not exist, a new account is created.")]
+        public IActionResult GoogleLogin([FromBody] GoogleLoginDto dto)
         {
-            if (googleLoginDto == null || string.IsNullOrWhiteSpace(googleLoginDto.IdToken))
-            {
-                return BadRequest(new
-                {
-                    Success = false,
-                    Message = "IdToken is required"
-                });
-            }
+            var result = _service.GoogleLogin(dto);
 
-            var response = await _userService.GoogleLoginAsync(googleLoginDto);
+            if (!result.Success)
+                return BadRequest(result);
 
-            if (!response.Success)
-            {
-                return Unauthorized(response);
-            }
-
-            return Ok(response);
+            return Ok(result);
         }
 
+        /// <summary>
+        /// Get current user details by email.
+        /// </summary>
+        /// <param name="email">User email address.</param>
+        /// <returns>Returns current user details.</returns>
         [HttpGet("me")]
-        [Authorize]
-        public IActionResult GetCurrentUser()
+        [SwaggerOperation(Summary = "Get current user", Description = "Returns user details for the provided email.")]
+        public IActionResult GetCurrentUser([FromQuery] string email)
         {
-            var email = User.FindFirst(ClaimTypes.Email)?.Value;
-            var name = User.FindFirst(ClaimTypes.Name)?.Value;
-            var role = User.FindFirst(ClaimTypes.Role)?.Value;
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = _service.GetCurrentUser(email);
 
-            return Ok(new
-            {
-                Success = true,
-                Message = "Current user fetched successfully",
-                Data = new
-                {
-                    UserId = userId,
-                    FullName = name,
-                    Email = email,
-                    Role = role
-                }
-            });
+            if (!result.Success)
+                return NotFound(result);
+
+            return Ok(result);
         }
     }
 }

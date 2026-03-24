@@ -6,6 +6,6 @@ namespace QuantityMeasurementAppBusinessLayer.Interfaces
     {
         AuthResponseDto Register(RegisterDto registerDto);
         AuthResponseDto Login(LoginDto loginDto);
-        AuthResponseDto GoogleLogin(GoogleLoginDto googleLoginDto);
+        Task<AuthResponseDto> GoogleLoginAsync(GoogleLoginDto googleLoginDto);
     }
 }

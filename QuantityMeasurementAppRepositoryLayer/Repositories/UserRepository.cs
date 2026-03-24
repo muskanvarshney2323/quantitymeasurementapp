@@ -1,19 +1,27 @@
 using QuantityMeasurementAppModel.Entities;
+using QuantityMeasurementAppRepositoryLayer.Context;
 using QuantityMeasurementAppRepositoryLayer.Interfaces;
 
 namespace QuantityMeasurementAppRepositoryLayer.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        public User? GetUserByEmail(string email)
+        private readonly AppDbContext _context;
+
+        public UserRepository(AppDbContext context)
         {
-            return null;
+            _context = context;
         }
 
-        public User AddUser(User user)
+        public User? GetUserByEmail(string email)
         {
-            user.UserId = 1;
-            return user;
+            return _context.Users.FirstOrDefault(x => x.Email == email);
+        }
+
+        public void AddUser(User user)
+        {
+            _context.Users.Add(user);
+            _context.SaveChanges();
         }
     }
 }

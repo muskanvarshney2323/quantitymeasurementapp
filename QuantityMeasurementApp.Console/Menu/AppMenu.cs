@@ -1,5 +1,6 @@
 using System;
 using QuantityMeasurementApp.Console.Controllers;
+using QuantityMeasurementAppModel;
 using QuantityMeasurementAppModel.DTOs;
 
 namespace QuantityMeasurementApp.Console.Menu
@@ -45,18 +46,23 @@ namespace QuantityMeasurementApp.Console.Menu
                         case 1:
                             HandleAdd();
                             break;
+
                         case 2:
                             HandleSubtract();
                             break;
+
                         case 3:
                             HandleDivide();
                             break;
+
                         case 4:
                             HandleConvert();
                             break;
+
                         case 5:
                             HandleCompare();
                             break;
+
                         default:
                             System.Console.WriteLine("Invalid choice.");
                             break;
@@ -72,52 +78,62 @@ namespace QuantityMeasurementApp.Console.Menu
         private void HandleAdd()
         {
             System.Console.WriteLine("\n--- Add Operation ---");
+
             QuantityDTO q1 = ReadQuantity("first");
             QuantityDTO q2 = ReadQuantity("second");
 
-            QuantityDTO result = _controller.Add(q1, q2);
+            QuantityDTO result = _controller.Add(q1.Value, q1.Unit, q2.Value, q2.Unit);
+
             System.Console.WriteLine($"Result: {result.Value} {result.Unit}");
         }
 
         private void HandleSubtract()
         {
             System.Console.WriteLine("\n--- Subtract Operation ---");
+
             QuantityDTO q1 = ReadQuantity("first");
             QuantityDTO q2 = ReadQuantity("second");
 
-            QuantityDTO result = _controller.Subtract(q1, q2);
+            QuantityDTO result = _controller.Subtract(q1.Value, q1.Unit, q2.Value, q2.Unit);
+
             System.Console.WriteLine($"Result: {result.Value} {result.Unit}");
         }
 
         private void HandleDivide()
         {
             System.Console.WriteLine("\n--- Divide Operation ---");
+
             QuantityDTO q1 = ReadQuantity("first");
             QuantityDTO q2 = ReadQuantity("second");
 
-            double result = _controller.Divide(q1, q2);
+            double result = _controller.Divide(q1.Value, q1.Unit, q2.Value, q2.Unit);
+
             System.Console.WriteLine($"Result: {result}");
         }
 
         private void HandleConvert()
         {
             System.Console.WriteLine("\n--- Convert Operation ---");
+
             QuantityDTO source = ReadQuantity("source");
 
             System.Console.Write("Enter target unit: ");
-            string targetUnit = System.Console.ReadLine() ?? "";
+            string targetUnit = (System.Console.ReadLine() ?? "").Trim().ToUpper();
 
-            QuantityDTO result = _controller.Convert(source, targetUnit);
+            QuantityDTO result = _controller.Convert(source.Value, source.Unit, targetUnit);
+
             System.Console.WriteLine($"Converted Result: {result.Value} {result.Unit}");
         }
 
         private void HandleCompare()
         {
             System.Console.WriteLine("\n--- Compare Operation ---");
+
             QuantityDTO q1 = ReadQuantity("first");
             QuantityDTO q2 = ReadQuantity("second");
 
-            bool isEqual = _controller.Compare(q1, q2);
+            bool isEqual = _controller.Compare(q1.Value, q1.Unit, q2.Value, q2.Unit);
+
             System.Console.WriteLine($"Are both quantities equal? {isEqual}");
         }
 
@@ -130,10 +146,16 @@ namespace QuantityMeasurementApp.Console.Menu
             System.Console.WriteLine("4. Temperature");
             System.Console.Write("Enter choice: ");
 
-            int typeChoice = int.Parse(System.Console.ReadLine()!);
+            if (!int.TryParse(System.Console.ReadLine(), out int typeChoice))
+            {
+                throw new Exception("Invalid measurement type choice.");
+            }
 
             System.Console.Write($"Enter {label} value: ");
-            double value = double.Parse(System.Console.ReadLine()!);
+            if (!double.TryParse(System.Console.ReadLine(), out double value))
+            {
+                throw new Exception("Invalid numeric value.");
+            }
 
             string unit = GetUnit(typeChoice, label);
 
@@ -155,7 +177,8 @@ namespace QuantityMeasurementApp.Console.Menu
                     System.Console.WriteLine("3. YARD");
                     System.Console.WriteLine("4. CENTIMETER");
                     System.Console.Write("Enter choice: ");
-                    return System.Console.ReadLine() switch
+
+                    return (System.Console.ReadLine() ?? "") switch
                     {
                         "1" => "FEET",
                         "2" => "INCH",
@@ -170,7 +193,8 @@ namespace QuantityMeasurementApp.Console.Menu
                     System.Console.WriteLine("2. GRAM");
                     System.Console.WriteLine("3. TONNE");
                     System.Console.Write("Enter choice: ");
-                    return System.Console.ReadLine() switch
+
+                    return (System.Console.ReadLine() ?? "") switch
                     {
                         "1" => "KILOGRAM",
                         "2" => "GRAM",
@@ -184,7 +208,8 @@ namespace QuantityMeasurementApp.Console.Menu
                     System.Console.WriteLine("2. MILLILITRE");
                     System.Console.WriteLine("3. GALLON");
                     System.Console.Write("Enter choice: ");
-                    return System.Console.ReadLine() switch
+
+                    return (System.Console.ReadLine() ?? "") switch
                     {
                         "1" => "LITRE",
                         "2" => "MILLILITRE",
@@ -198,7 +223,8 @@ namespace QuantityMeasurementApp.Console.Menu
                     System.Console.WriteLine("2. FAHRENHEIT");
                     System.Console.WriteLine("3. KELVIN");
                     System.Console.Write("Enter choice: ");
-                    return System.Console.ReadLine() switch
+
+                    return (System.Console.ReadLine() ?? "") switch
                     {
                         "1" => "CELSIUS",
                         "2" => "FAHRENHEIT",

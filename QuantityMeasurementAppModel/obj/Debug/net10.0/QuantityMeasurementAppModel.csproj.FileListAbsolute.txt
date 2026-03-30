@@ -1,0 +1,12 @@
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppModel\bin\Debug\net10.0\QuantityMeasurementAppModel.deps.json
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppModel\bin\Debug\net10.0\QuantityMeasurementAppModel.dll
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppModel\bin\Debug\net10.0\QuantityMeasurementAppModel.pdb
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppModel\obj\Debug\net10.0\QuantityMeasurementAppModel.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppModel\obj\Debug\net10.0\QuantityMeasurementAppModel.AssemblyInfoInputs.cache
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppModel\obj\Debug\net10.0\QuantityMeasurementAppModel.AssemblyInfo.cs
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppModel\obj\Debug\net10.0\QuantityMeasurementAppModel.csproj.CoreCompileInputs.cache
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppModel\obj\Debug\net10.0\QuantityMeasurementAppModel.sourcelink.json
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppModel\obj\Debug\net10.0\QuantityMeasurementAppModel.dll
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppModel\obj\Debug\net10.0\refint\QuantityMeasurementAppModel.dll
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppModel\obj\Debug\net10.0\QuantityMeasurementAppModel.pdb
+C:\Users\Divyanshu Dev\OneDrive\Desktop\Muskan\QuantityMeasurementApp\QuantityMeasurementAppModel\obj\Debug\net10.0\ref\QuantityMeasurementAppModel.dll

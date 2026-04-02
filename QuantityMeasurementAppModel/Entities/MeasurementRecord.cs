@@ -1,10 +1,14 @@
+using QuantityMeasurementAppModel.Enums;
+
 namespace QuantityMeasurementAppModel.Entities
 {
     public class MeasurementRecord
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+
         public DateTime Timestamp { get; set; }
-        public string Operation { get; set; } = string.Empty;
+
+        public OperationType Operation { get; set; }
 
         public double? Input1Value { get; set; }
         public string? Input1Unit { get; set; }
@@ -26,5 +30,6 @@ namespace QuantityMeasurementAppModel.Entities
 
         public bool SuccessFlag { get; set; }
         public string? ErrorMessage { get; set; }
+
     }
 }

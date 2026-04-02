@@ -2,8 +2,10 @@ namespace QuantityMeasurementAppModel.Enums
 {
     public enum OperationType
     {
-        Compare,
-        Add,
-        Convert
+        Add = 1,
+        Subtract = 2,
+        Compare = 3,
+        Divide = 4,
+        Convert = 5
     }
 }

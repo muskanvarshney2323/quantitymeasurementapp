@@ -1,6 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using QuantityMeasurementApp.Common;
-using QuantityMeasurementApp.Models;
+using QuantityMeasurementAppModel.Entities;
 using System;
 
 namespace QuantityMeasurementApp.Tests.Models

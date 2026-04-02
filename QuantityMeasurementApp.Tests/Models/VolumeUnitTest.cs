@@ -1,6 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using QuantityMeasurementApp.Enums;
-using QuantityMeasurementApp.Extensions;
+using QuantityMeasurementAppModel.Enums;
 
 namespace QuantityMeasurementApp.Tests.Models
 {

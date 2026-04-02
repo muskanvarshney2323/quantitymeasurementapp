@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
-using QuantityMeasurementAppBusinessLayer;
+using QuantityMeasurementAppBusinessLayer.Interfaces;
+using QuantityMeasurementAppBusinessLayer.Services;
 using QuantityMeasurementAppModel;
 using QuantityMeasurementAppModel.DTOs;
+using QuantityMeasurementAppModel.Entities;
 
 namespace QuantityMeasurementApp.Console.Controllers
 {
@@ -22,22 +24,20 @@ namespace QuantityMeasurementApp.Console.Controllers
             bool result = true;
 
             // Save comparison record into database
-            var entity = new QuantityMeasurementEntity
+            var entity = new MeasurementRecord
             {
                 Id = Guid.NewGuid().ToString(),
-                CreatedAt = DateTime.Now,
-                OperationType = 0,
-                FirstValue = 1,
-                FirstUnit = "Unit1",
-                SecondValue = 1,
-                SecondUnit = "Unit2",
-                ResultValue = result ? 1 : 0,
-                ResultUnit = "Boolean",
-                IsSuccessful = true,
+                Timestamp = DateTime.Now,
+                Operation = QuantityMeasurementAppModel.Enums.OperationType.Compare,
+                Input1Value = 1,
+                Input1Unit = "Unit1",
+                Input2Value = 1,
+                Input2Unit = "Unit2",
+                OutputText = result.ToString(),
+                SuccessFlag = true,
                 ErrorMessage = null
             };
 
-            service.SaveMeasurement(entity);
             return result;
         }
 
@@ -51,22 +51,21 @@ namespace QuantityMeasurementApp.Console.Controllers
             };
 
             // Save conversion record into database
-            var entity = new QuantityMeasurementEntity
+            var entity = new MeasurementRecord
             {
                 Id = Guid.NewGuid().ToString(),
-                CreatedAt = DateTime.Now,
-                OperationType = 1,
-                FirstValue = 1,
-                FirstUnit = "Feet",
-                SecondValue = null,
-                SecondUnit = null,
-                ResultValue = result.Value,
-                ResultUnit = result.Unit,
-                IsSuccessful = true,
+                Timestamp = DateTime.Now,
+                Operation = QuantityMeasurementAppModel.Enums.OperationType.Convert,
+                OriginalValue = 1,
+                OriginalUnit = "Feet",
+                DesiredUnit = targetUnit,
+                OutputValue = result.Value,
+                OutputUnit = result.Unit,
+                OutputText = result.ToString(),
+                SuccessFlag = true,
                 ErrorMessage = null
             };
 
-            service.SaveMeasurement(entity);
             return result;
         }
 
@@ -80,22 +79,22 @@ namespace QuantityMeasurementApp.Console.Controllers
             };
 
             // Save addition record into database
-            var entity = new QuantityMeasurementEntity
+            var entity = new MeasurementRecord
             {
                 Id = Guid.NewGuid().ToString(),
-                CreatedAt = DateTime.Now,
-                OperationType = 2,
-                FirstValue = 2,
-                FirstUnit = "Feet",
-                SecondValue = 3,
-                SecondUnit = "Feet",
-                ResultValue = result.Value,
-                ResultUnit = result.Unit,
-                IsSuccessful = true,
+                Timestamp = DateTime.Now,
+                Operation = QuantityMeasurementAppModel.Enums.OperationType.Add,
+                Input1Value = 2,
+                Input1Unit = "Feet",
+                Input2Value = 3,
+                Input2Unit = "Feet",
+                OutputValue = result.Value,
+                OutputUnit = result.Unit,
+                OutputText = result.ToString(),
+                SuccessFlag = true,
                 ErrorMessage = null
             };
 
-            service.SaveMeasurement(entity);
             return result;
         }
 
@@ -109,22 +108,22 @@ namespace QuantityMeasurementApp.Console.Controllers
             };
 
             // Save subtraction record into database
-            var entity = new QuantityMeasurementEntity
+            var entity = new MeasurementRecord
             {
                 Id = Guid.NewGuid().ToString(),
-                CreatedAt = DateTime.Now,
-                OperationType = 3,
-                FirstValue = 3,
-                FirstUnit = "Feet",
-                SecondValue = 2,
-                SecondUnit = "Feet",
-                ResultValue = result.Value,
-                ResultUnit = result.Unit,
-                IsSuccessful = true,
+                Timestamp = DateTime.Now,
+                Operation = QuantityMeasurementAppModel.Enums.OperationType.Subtract,
+                Input1Value = 3,
+                Input1Unit = "Feet",
+                Input2Value = 2,
+                Input2Unit = "Feet",
+                OutputValue = result.Value,
+                OutputUnit = result.Unit,
+                OutputText = result.ToString(),
+                SuccessFlag = true,
                 ErrorMessage = null
             };
 
-            service.SaveMeasurement(entity);
             return result;
         }
 
@@ -134,35 +133,34 @@ namespace QuantityMeasurementApp.Console.Controllers
             double result = 2;
 
             // Save division record into database
-            var entity = new QuantityMeasurementEntity
+            var entity = new MeasurementRecord
             {
                 Id = Guid.NewGuid().ToString(),
-                CreatedAt = DateTime.Now,
-                OperationType = 4,
-                FirstValue = 10,
-                FirstUnit = "Feet",
-                SecondValue = 5,
-                SecondUnit = "Feet",
-                ResultValue = result,
-                ResultUnit = "Numeric",
-                IsSuccessful = true,
+                Timestamp = DateTime.Now,
+                Operation = QuantityMeasurementAppModel.Enums.OperationType.Divide,
+                Input1Value = 10,
+                Input1Unit = "Feet",
+                Input2Value = 5,
+                Input2Unit = "Feet",
+                OutputValue = result,
+                OutputText = result.ToString(),
+                SuccessFlag = true,
                 ErrorMessage = null
             };
 
-            service.SaveMeasurement(entity);
             return result;
         }
 
         // Get all saved history from database
-        public List<QuantityMeasurementEntity> GetHistory()
+        public List<MeasurementRecord> GetHistory()
         {
-            return service.GetAllMeasurements();
+            return service.GetHistory();
         }
 
         // Save measurement manually into database
-        public void SaveMeasurement(QuantityMeasurementEntity entity)
+        public void SaveMeasurement(MeasurementRecord entity)
         {
-            service.SaveMeasurement(entity);
+            // Measurements are saved automatically within service operations
         }
     }
 }

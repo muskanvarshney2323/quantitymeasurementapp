@@ -1,7 +1,8 @@
 using QuantityMeasurementApp.Console.Controllers;
 using QuantityMeasurementApp.Console.Menu;
-using QuantityMeasurementAppBusinessLayer;
-using QuantityMeasurementAppRepositoryLayer;
+using QuantityMeasurementAppBusinessLayer.Interfaces;
+using QuantityMeasurementAppBusinessLayer.Services;
+using QuantityMeasurementAppRepositoryLayer.Interfaces;
 using QuantityMeasurementAppRepositoryLayer.Repositories;
 
 namespace QuantityMeasurementApp.Console
@@ -10,7 +11,7 @@ namespace QuantityMeasurementApp.Console
     {
         static void Main(string[] args)
         {
-            IQuantityMeasurementRepository repository = new QuantityMeasurementDbRepository();
+            IQuantityMeasurementRepository repository = new QuantityMeasurementDatabaseRepository(null);
             IQuantityMeasurementService service = new QuantityMeasurementService(repository);
 
             QuantityMeasurementController controller = new QuantityMeasurementController(service);

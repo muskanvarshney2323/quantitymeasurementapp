@@ -28,12 +28,24 @@ namespace QuantityMeasurementAppAPI.Controllers
         [SwaggerOperation(Summary = "Register user", Description = "Creates a new user account using name, email, and password.")]
         public IActionResult Register([FromBody] RegisterDto dto)
         {
-            var result = _service.Register(dto);
+            try
+            {
+                var result = _service.Register(dto);
 
-            if (!result.Success)
-                return BadRequest(result);
+                if (!result.Success)
+                    return BadRequest(result);
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = ex.Message,
+                    inner = ex.InnerException?.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
         }
 
         /// <summary>

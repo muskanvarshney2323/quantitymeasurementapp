@@ -1,488 +1,262 @@
 using QuantityMeasurementAppBusinessLayer.Interfaces;
 using QuantityMeasurementAppModel.Entities;
-using QuantityMeasurementAppModel.Enums;
-using QuantityMeasurementAppRepositoryLayer.Interfaces;
 
 namespace QuantityMeasurementAppBusinessLayer.Services
 {
     public class QuantityMeasurementService : IQuantityMeasurementService
     {
-        private readonly IQuantityMeasurementRepository _quantityRepository;
-
-        public QuantityMeasurementService(IQuantityMeasurementRepository quantityRepository)
-        {
-            _quantityRepository = quantityRepository;
-        }
-
-        public string Add(double value1, string unit1, double value2, string unit2, string quantityType)
-        {
-            try
-            {
-                double convertedValue2 = ConvertToBaseUnit(value2, unit2, quantityType);
-                double convertedValue1 = ConvertToBaseUnit(value1, unit1, quantityType);
-
-                double sumBase = convertedValue1 + convertedValue2;
-                double result = ConvertFromBaseUnit(sumBase, unit1, quantityType);
-
-                string resultText = $"{result} {unit1}";
-
-                var record = new MeasurementRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Timestamp = DateTime.Now,
-                    Operation = OperationType.Add,
-
-                    Input1Value = value1,
-                    Input1Unit = unit1,
-                    Input1Type = quantityType,
-
-                    Input2Value = value2,
-                    Input2Unit = unit2,
-                    Input2Type = quantityType,
-
-                    OutputValue = result,
-                    OutputUnit = unit1,
-                    OutputText = resultText,
-
-                    SuccessFlag = true
-                };
-
-                _quantityRepository.SaveMeasurementRecord(record);
-
-                return resultText;
-            }
-            catch (Exception ex)
-            {
-                var record = new MeasurementRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Timestamp = DateTime.Now,
-                    Operation = OperationType.Add,
-                    Input2Unit = unit2,
-                    Input2Type = quantityType,
-
-                    SuccessFlag = false,
-                    ErrorMessage = ex.Message
-                };
-
-                _quantityRepository.SaveMeasurementRecord(record);
-                throw;
-            }
-        }
-
-        public string Subtract(double value1, string unit1, double value2, string unit2, string quantityType)
-        {
-            try
-            {
-                double convertedValue2 = ConvertToBaseUnit(value2, unit2, quantityType);
-                double convertedValue1 = ConvertToBaseUnit(value1, unit1, quantityType);
-
-                double differenceBase = convertedValue1 - convertedValue2;
-                double result = ConvertFromBaseUnit(differenceBase, unit1, quantityType);
-
-                string resultText = $"{result} {unit1}";
-
-                var record = new MeasurementRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Timestamp = DateTime.Now,
-                    Operation = OperationType.Subtract,
-
-                    Input1Value = value1,
-                    Input1Unit = unit1,
-                    Input1Type = quantityType,
-
-                    Input2Value = value2,
-                    Input2Unit = unit2,
-                    Input2Type = quantityType,
-
-                    OutputValue = result,
-                    OutputUnit = unit1,
-                    OutputText = resultText,
-
-                    SuccessFlag = true
-                };
-
-                _quantityRepository.SaveMeasurementRecord(record);
-
-                return resultText;
-            }
-            catch (Exception ex)
-            {
-                var record = new MeasurementRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Timestamp = DateTime.Now,
-                    Operation = OperationType.Subtract,
-
-                    Input1Value = value1,
-                    Input1Unit = unit1,
-                    Input1Type = quantityType,
-
-                    Input2Value = value2,
-                    Input2Unit = unit2,
-                    Input2Type = quantityType,
-
-                    SuccessFlag = false,
-                    ErrorMessage = ex.Message
-                };
-
-                _quantityRepository.SaveMeasurementRecord(record);
-                throw;
-            }
-        }
-
         public string Compare(double value1, string unit1, double value2, string unit2, string quantityType)
         {
-            try
+            ValidateTwoValueRequest(value1, unit1, value2, unit2, quantityType);
+
+            double baseValue1 = ConvertToBaseUnit(value1, unit1, quantityType);
+            double baseValue2 = ConvertToBaseUnit(value2, unit2, quantityType);
+
+            if (baseValue1 > baseValue2)
             {
-                double convertedValue1 = ConvertToBaseUnit(value1, unit1, quantityType);
-                double convertedValue2 = ConvertToBaseUnit(value2, unit2, quantityType);
-
-                string resultText;
-
-                if (convertedValue1 > convertedValue2)
-                {
-                    resultText = $"{value1} {unit1} is greater than {value2} {unit2}";
-                }
-                else if (convertedValue1 < convertedValue2)
-                {
-                    resultText = $"{value1} {unit1} is less than {value2} {unit2}";
-                }
-                else
-                {
-                    resultText = $"{value1} {unit1} is equal to {value2} {unit2}";
-                }
-
-                var record = new MeasurementRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Timestamp = DateTime.Now,
-                    Operation = OperationType.Compare,
-
-                    Input1Value = value1,
-                    Input1Unit = unit1,
-                    Input1Type = quantityType,
-
-                    Input2Value = value2,
-                    Input2Unit = unit2,
-                    Input2Type = quantityType,
-
-                    OutputText = resultText,
-                    SuccessFlag = true
-                };
-
-                _quantityRepository.SaveMeasurementRecord(record);
-
-                return resultText;
+                return "First value is greater";
             }
-            catch (Exception ex)
+            else if (baseValue1 < baseValue2)
             {
-                var record = new MeasurementRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Timestamp = DateTime.Now,
-                    Operation = OperationType.Compare,
-
-                    Input1Value = value1,
-                    Input1Unit = unit1,
-                    Input1Type = quantityType,
-
-                    Input2Value = value2,
-                    Input2Unit = unit2,
-                    Input2Type = quantityType,
-
-                    SuccessFlag = false,
-                    ErrorMessage = ex.Message
-                };
-
-                _quantityRepository.SaveMeasurementRecord(record);
-                throw;
+                return "Second value is greater";
             }
-        }
-
-        public string Divide(double value1, string unit1, double value2, string unit2, string quantityType)
-        {
-            try
+            else
             {
-                double convertedValue1 = ConvertToBaseUnit(value1, unit1, quantityType);
-                double convertedValue2 = ConvertToBaseUnit(value2, unit2, quantityType);
-
-                if (convertedValue2 == 0)
-                {
-                    throw new DivideByZeroException("Cannot divide by zero.");
-                }
-
-                double result = convertedValue1 / convertedValue2;
-                string resultText = result.ToString();
-
-                var record = new MeasurementRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Timestamp = DateTime.Now,
-                    Operation = OperationType.Divide,
-
-                    Input1Value = value1,
-                    Input1Unit = unit1,
-                    Input1Type = quantityType,
-
-                    Input2Value = value2,
-                    Input2Unit = unit2,
-                    Input2Type = quantityType,
-
-                    OutputValue = result,
-                    OutputText = resultText,
-
-                    SuccessFlag = true
-                };
-
-                _quantityRepository.SaveMeasurementRecord(record);
-
-                return resultText;
-            }
-            catch (Exception ex)
-            {
-                var record = new MeasurementRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Timestamp = DateTime.Now,
-                    Operation = OperationType.Divide,
-
-                    Input1Value = value1,
-                    Input1Unit = unit1,
-                    Input1Type = quantityType,
-
-                    Input2Value = value2,
-                    Input2Unit = unit2,
-                    Input2Type = quantityType,
-
-                    SuccessFlag = false,
-                    ErrorMessage = ex.Message
-                };
-
-                _quantityRepository.SaveMeasurementRecord(record);
-                throw;
+                return "Both values are equal";
             }
         }
 
         public string Convert(double value, string fromUnit, string toUnit, string quantityType)
         {
-            try
+            ValidateConvertRequest(value, fromUnit, toUnit, quantityType);
+
+            double baseValue = ConvertToBaseUnit(value, fromUnit, quantityType);
+            double convertedValue = ConvertFromBaseUnit(baseValue, toUnit, quantityType);
+
+            return $"{value} {fromUnit} = {Math.Round(convertedValue, 4)} {toUnit}";
+        }
+
+        public string Add(double value1, string unit1, double value2, string unit2, string quantityType)
+        {
+            ValidateTwoValueRequest(value1, unit1, value2, unit2, quantityType);
+
+            if (quantityType.Trim().Equals("temperature", StringComparison.OrdinalIgnoreCase))
             {
-                double baseValue = ConvertToBaseUnit(value, fromUnit, quantityType);
-                double convertedValue = ConvertFromBaseUnit(baseValue, toUnit, quantityType);
-
-                string resultText = $"{convertedValue} {toUnit}";
-
-                var record = new MeasurementRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Timestamp = DateTime.Now,
-                    Operation = OperationType.Convert,
-
-                    OriginalValue = value,
-                    OriginalUnit = fromUnit,
-                    OriginalType = quantityType,
-
-                    DesiredUnit = toUnit,
-
-                    OutputValue = convertedValue,
-                    OutputUnit = toUnit,
-                    OutputText = resultText,
-
-                    SuccessFlag = true
-                };
-
-                _quantityRepository.SaveMeasurementRecord(record);
-
-                return resultText;
+                throw new Exception("Add operation is not supported for Temperature.");
             }
-            catch (Exception ex)
+
+            double baseValue1 = ConvertToBaseUnit(value1, unit1, quantityType);
+            double baseValue2 = ConvertToBaseUnit(value2, unit2, quantityType);
+
+            double sumBase = baseValue1 + baseValue2;
+            double finalValue = ConvertFromBaseUnit(sumBase, unit1, quantityType);
+
+            return $"{value1} {unit1} + {value2} {unit2} = {Math.Round(finalValue, 4)} {unit1}";
+        }
+
+        public string Subtract(double value1, string unit1, double value2, string unit2, string quantityType)
+        {
+            ValidateTwoValueRequest(value1, unit1, value2, unit2, quantityType);
+
+            if (quantityType.Trim().Equals("temperature", StringComparison.OrdinalIgnoreCase))
             {
-                var record = new MeasurementRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Timestamp = DateTime.Now,
-                    Operation = OperationType.Convert,
+                throw new Exception("Subtract operation is not supported for Temperature.");
+            }
 
-                    OriginalValue = value,
-                    OriginalUnit = fromUnit,
-                    OriginalType = quantityType,
+            double baseValue1 = ConvertToBaseUnit(value1, unit1, quantityType);
+            double baseValue2 = ConvertToBaseUnit(value2, unit2, quantityType);
 
-                    DesiredUnit = toUnit,
+            double differenceBase = baseValue1 - baseValue2;
+            double finalValue = ConvertFromBaseUnit(differenceBase, unit1, quantityType);
 
-                    SuccessFlag = false,
-                    ErrorMessage = ex.Message
-                };
+            return $"{value1} {unit1} - {value2} {unit2} = {Math.Round(finalValue, 4)} {unit1}";
+        }
 
-                _quantityRepository.SaveMeasurementRecord(record);
-                throw;
+        public string Divide(double value1, string unit1, double value2, string unit2, string quantityType)
+        {
+            ValidateTwoValueRequest(value1, unit1, value2, unit2, quantityType);
+
+            if (quantityType.Trim().Equals("temperature", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception("Divide operation is not supported for Temperature.");
+            }
+
+            double baseValue1 = ConvertToBaseUnit(value1, unit1, quantityType);
+            double baseValue2 = ConvertToBaseUnit(value2, unit2, quantityType);
+
+            if (baseValue2 == 0)
+            {
+                throw new Exception("Cannot divide by zero.");
+            }
+
+            double result = baseValue1 / baseValue2;
+
+            return $"{value1} {unit1} / {value2} {unit2} = {Math.Round(result, 4)}";
+        }
+
+        public List<MeasurementRecord> GetHistory()
+        {
+            return new List<MeasurementRecord>();
+        }
+
+        public int GetCount()
+        {
+            return 0;
+        }
+
+        public List<string> GetOperationTypes()
+        {
+            return new List<string> { "Convert", "Add", "Subtract", "Divide", "Compare" };
+        }
+
+        public List<string> GetMeasurementTypes()
+        {
+            return new List<string> { "Length", "Weight", "Volume", "Temperature" };
+        }
+
+        private void ValidateConvertRequest(double value, string fromUnit, string toUnit, string quantityType)
+        {
+            if (string.IsNullOrWhiteSpace(fromUnit))
+            {
+                throw new Exception("FromUnit is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(toUnit))
+            {
+                throw new Exception("ToUnit is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(quantityType))
+            {
+                throw new Exception("QuantityType is required.");
+            }
+        }
+
+        private void ValidateTwoValueRequest(double value1, string unit1, double value2, string unit2, string quantityType)
+        {
+            if (string.IsNullOrWhiteSpace(unit1))
+            {
+                throw new Exception("Unit1 is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(unit2))
+            {
+                throw new Exception("Unit2 is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(quantityType))
+            {
+                throw new Exception("QuantityType is required.");
             }
         }
 
         private double ConvertToBaseUnit(double value, string unit, string quantityType)
         {
-            switch (quantityType.ToLower())
+            string normalizedQuantityType = quantityType.Trim().ToLower();
+            string normalizedUnit = unit.Trim().ToLower();
+
+            if (normalizedQuantityType == "temperature")
             {
-                case "length":
-                    switch (unit.ToLower())
-                    {
-                        case "inch":
-                            return value;
-                        case "feet":
-                            return value * 12;
-                        case "yard":
-                            return value * 36;
-                        case "centimeter":
-                            return value / 2.54;
-                        case "meter":
-                            return value * 39.3701;
-                        default:
-                            throw new ArgumentException("Invalid length unit");
-                    }
-
-                case "weight":
-                    switch (unit.ToLower())
-                    {
-                        case "gram":
-                            return value;
-                        case "kilogram":
-                            return value * 1000;
-                        case "tonne":
-                            return value * 1000000;
-                        default:
-                            throw new ArgumentException("Invalid weight unit");
-                    }
-
-                case "temperature":
-                    switch (unit.ToLower())
-                    {
-                        case "celsius":
-                            return value;
-                        case "fahrenheit":
-                            return (value - 32) * 5 / 9;
-                        case "kelvin":
-                            return value - 273.15;
-                        default:
-                            throw new ArgumentException("Invalid temperature unit");
-                    }
-
-                case "volume":
-                    switch (unit.ToLower())
-                    {
-                        case "milliliter":
-                            return value;
-                        case "liter":
-                            return value * 1000;
-                        case "gallon":
-                            return value * 3785.41;
-                        default:
-                            throw new ArgumentException("Invalid volume unit");
-                    }
-
-                default:
-                    throw new ArgumentException("Invalid quantity type");
+                return ConvertTemperatureToCelsius(value, normalizedUnit);
             }
+
+            Dictionary<string, double> factors = GetUnitFactors(normalizedQuantityType);
+
+            if (!factors.ContainsKey(normalizedUnit))
+            {
+                throw new Exception($"Invalid unit '{unit}' for quantity type '{quantityType}'.");
+            }
+
+            return value * factors[normalizedUnit];
         }
+
         private double ConvertFromBaseUnit(double value, string unit, string quantityType)
         {
-            switch (quantityType.ToLower())
+            string normalizedQuantityType = quantityType.Trim().ToLower();
+            string normalizedUnit = unit.Trim().ToLower();
+
+            if (normalizedQuantityType == "temperature")
             {
-                case "length":
-                    switch (unit.ToLower())
-                    {
-                        case "inch":
-                            return value;
-                        case "feet":
-                            return value / 12;
-                        case "yard":
-                            return value / 36;
-                        case "centimeter":
-                            return value * 2.54;
-                        case "meter":
-                            return value / 39.3701;
-                        default:
-                            throw new ArgumentException("Invalid length unit");
-                    }
-
-                case "weight":
-                    switch (unit.ToLower())
-                    {
-                        case "gram":
-                            return value;
-                        case "kilogram":
-                            return value / 1000;
-                        case "tonne":
-                            return value / 1000000;
-                        default:
-                            throw new ArgumentException("Invalid weight unit");
-                    }
-
-                case "temperature":
-                    switch (unit.ToLower())
-                    {
-                        case "celsius":
-                            return value;
-                        case "fahrenheit":
-                            return (value * 9 / 5) + 32;
-                        case "kelvin":
-                            return value + 273.15;
-                        default:
-                            throw new ArgumentException("Invalid temperature unit");
-                    }
-
-                case "volume":
-                    switch (unit.ToLower())
-                    {
-                        case "milliliter":
-                            return value;
-                        case "liter":
-                            return value / 1000;
-                        case "gallon":
-                            return value / 3785.41;
-                        default:
-                            throw new ArgumentException("Invalid volume unit");
-                    }
-
-                default:
-                    throw new ArgumentException("Invalid quantity type");
+                return ConvertCelsiusToTarget(value, normalizedUnit);
             }
+
+            Dictionary<string, double> factors = GetUnitFactors(normalizedQuantityType);
+
+            if (!factors.ContainsKey(normalizedUnit))
+            {
+                throw new Exception($"Invalid unit '{unit}' for quantity type '{quantityType}'.");
+            }
+
+            return value / factors[normalizedUnit];
         }
-        private string GetBaseUnit(string quantityType)
+
+        private Dictionary<string, double> GetUnitFactors(string quantityType)
         {
-            switch (quantityType.ToLower())
+            switch (quantityType)
             {
                 case "length":
-                    return "Inch";
+                    return new Dictionary<string, double>
+                    {
+                        { "millimeter", 0.001 },
+                        { "centimeter", 0.01 },
+                        { "meter", 1 },
+                        { "kilometer", 1000 }
+                    };
+
                 case "weight":
-                    return "Gram";
-                case "temperature":
-                    return "Celsius";
+                    return new Dictionary<string, double>
+                    {
+                        { "milligram", 0.001 },
+                        { "gram", 1 },
+                        { "kilogram", 1000 }
+                    };
+
                 case "volume":
-                    return "Milliliter";
+                    return new Dictionary<string, double>
+                    {
+                        { "milliliter", 0.001 },
+                        { "liter", 1 }
+                    };
+
                 default:
-                    throw new ArgumentException("Invalid quantity type");
+                    throw new Exception("Invalid quantity type.");
             }
         }
 
-        public List<MeasurementRecord> GetHistory()
+        private double ConvertTemperatureToCelsius(double value, string unit)
         {
-            return _quantityRepository.GetAllRecords();
+            switch (unit)
+            {
+                case "celsius":
+                    return value;
+
+                case "fahrenheit":
+                    return (value - 32) * 5 / 9;
+
+                case "kelvin":
+                    return value - 273.15;
+
+                default:
+                    throw new Exception("Invalid temperature unit.");
+            }
         }
 
-        public int GetCount()
+        private double ConvertCelsiusToTarget(double value, string unit)
         {
-            return _quantityRepository.GetRecordCount();
-        }
+            switch (unit)
+            {
+                case "celsius":
+                    return value;
 
-        public List<string> GetOperationTypes()
-        {
-            return Enum.GetNames(typeof(OperationType)).ToList();
-        }
+                case "fahrenheit":
+                    return (value * 9 / 5) + 32;
 
-        public List<string> GetMeasurementTypes()
-        {
-            return new List<string> { "Length", "Weight", "Temperature" };
+                case "kelvin":
+                    return value + 273.15;
+
+                default:
+                    throw new Exception("Invalid temperature unit.");
+            }
         }
     }
 }

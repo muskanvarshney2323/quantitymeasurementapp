@@ -32,7 +32,7 @@ namespace QuantityMeasurementAppBusinessLayer.Services
                 Name = dto.Name,
                 Email = dto.Email,
                 PasswordHash = dto.Password,
-                Role = "User"
+                IsGoogleUser = false
             };
 
             _repository.AddUser(user);
@@ -80,7 +80,7 @@ namespace QuantityMeasurementAppBusinessLayer.Services
                     Name = dto.Name,
                     Email = dto.Email,
                     PasswordHash = "GoogleAuth",
-                    Role = "User"
+                    IsGoogleUser = true
                 };
 
                 _repository.AddUser(user);

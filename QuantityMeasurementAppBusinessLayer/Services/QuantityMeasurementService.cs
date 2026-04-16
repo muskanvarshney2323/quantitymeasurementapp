@@ -9,80 +9,102 @@ namespace QuantityMeasurementAppBusinessLayer.Services
         {
             ValidateTwoValueRequest(value1, unit1, value2, unit2, quantityType);
 
-            double baseValue1 = ConvertToBaseUnit(value1, unit1, quantityType);
-            double baseValue2 = ConvertToBaseUnit(value2, unit2, quantityType);
+            string normalizedQuantityType = NormalizeQuantityType(quantityType);
+            string displayUnit1 = FormatUnitName(unit1, normalizedQuantityType);
+            string displayUnit2 = FormatUnitName(unit2, normalizedQuantityType);
+
+            double baseValue1 = ConvertToBaseUnit(value1, unit1, normalizedQuantityType);
+            double baseValue2 = ConvertToBaseUnit(value2, unit2, normalizedQuantityType);
 
             if (baseValue1 > baseValue2)
             {
-                return "First value is greater";
+                return $"{value1} {displayUnit1} is greater than {value2} {displayUnit2}";
             }
-            else if (baseValue1 < baseValue2)
+
+            if (baseValue1 < baseValue2)
             {
-                return "Second value is greater";
+                return $"{value2} {displayUnit2} is greater than {value1} {displayUnit1}";
             }
-            else
-            {
-                return "Both values are equal";
-            }
+
+            return "Both values are equal";
         }
 
         public string Convert(double value, string fromUnit, string toUnit, string quantityType)
         {
             ValidateConvertRequest(value, fromUnit, toUnit, quantityType);
 
-            double baseValue = ConvertToBaseUnit(value, fromUnit, quantityType);
-            double convertedValue = ConvertFromBaseUnit(baseValue, toUnit, quantityType);
+            string normalizedQuantityType = NormalizeQuantityType(quantityType);
+            string displayFromUnit = FormatUnitName(fromUnit, normalizedQuantityType);
+            string displayToUnit = FormatUnitName(toUnit, normalizedQuantityType);
 
-            return $"{value} {fromUnit} = {Math.Round(convertedValue, 4)} {toUnit}";
+            double baseValue = ConvertToBaseUnit(value, fromUnit, normalizedQuantityType);
+            double convertedValue = ConvertFromBaseUnit(baseValue, toUnit, normalizedQuantityType);
+
+            return $"{value} {displayFromUnit} = {Math.Round(convertedValue, 4)} {displayToUnit}";
         }
 
         public string Add(double value1, string unit1, double value2, string unit2, string quantityType)
         {
             ValidateTwoValueRequest(value1, unit1, value2, unit2, quantityType);
 
-            if (quantityType.Trim().Equals("temperature", StringComparison.OrdinalIgnoreCase))
+            string normalizedQuantityType = NormalizeQuantityType(quantityType);
+
+            if (normalizedQuantityType == "temperature")
             {
                 throw new Exception("Add operation is not supported for Temperature.");
             }
 
-            double baseValue1 = ConvertToBaseUnit(value1, unit1, quantityType);
-            double baseValue2 = ConvertToBaseUnit(value2, unit2, quantityType);
+            string displayUnit1 = FormatUnitName(unit1, normalizedQuantityType);
+            string displayUnit2 = FormatUnitName(unit2, normalizedQuantityType);
+
+            double baseValue1 = ConvertToBaseUnit(value1, unit1, normalizedQuantityType);
+            double baseValue2 = ConvertToBaseUnit(value2, unit2, normalizedQuantityType);
 
             double sumBase = baseValue1 + baseValue2;
-            double finalValue = ConvertFromBaseUnit(sumBase, unit1, quantityType);
+            double finalValue = ConvertFromBaseUnit(sumBase, unit1, normalizedQuantityType);
 
-            return $"{value1} {unit1} + {value2} {unit2} = {Math.Round(finalValue, 4)} {unit1}";
+            return $"{value1} {displayUnit1} + {value2} {displayUnit2} = {Math.Round(finalValue, 4)} {displayUnit1}";
         }
 
         public string Subtract(double value1, string unit1, double value2, string unit2, string quantityType)
         {
             ValidateTwoValueRequest(value1, unit1, value2, unit2, quantityType);
 
-            if (quantityType.Trim().Equals("temperature", StringComparison.OrdinalIgnoreCase))
+            string normalizedQuantityType = NormalizeQuantityType(quantityType);
+
+            if (normalizedQuantityType == "temperature")
             {
                 throw new Exception("Subtract operation is not supported for Temperature.");
             }
 
-            double baseValue1 = ConvertToBaseUnit(value1, unit1, quantityType);
-            double baseValue2 = ConvertToBaseUnit(value2, unit2, quantityType);
+            string displayUnit1 = FormatUnitName(unit1, normalizedQuantityType);
+            string displayUnit2 = FormatUnitName(unit2, normalizedQuantityType);
+
+            double baseValue1 = ConvertToBaseUnit(value1, unit1, normalizedQuantityType);
+            double baseValue2 = ConvertToBaseUnit(value2, unit2, normalizedQuantityType);
 
             double differenceBase = baseValue1 - baseValue2;
-            double finalValue = ConvertFromBaseUnit(differenceBase, unit1, quantityType);
+            double finalValue = ConvertFromBaseUnit(differenceBase, unit1, normalizedQuantityType);
 
-            return $"{value1} {unit1} - {value2} {unit2} = {Math.Round(finalValue, 4)} {unit1}";
+            return $"{value1} {displayUnit1} - {value2} {displayUnit2} = {Math.Round(finalValue, 4)} {displayUnit1}";
         }
 
         public string Divide(double value1, string unit1, double value2, string unit2, string quantityType)
         {
             ValidateTwoValueRequest(value1, unit1, value2, unit2, quantityType);
 
-            if (quantityType.Trim().Equals("temperature", StringComparison.OrdinalIgnoreCase))
+            string normalizedQuantityType = NormalizeQuantityType(quantityType);
+
+            if (normalizedQuantityType == "temperature")
             {
                 throw new Exception("Divide operation is not supported for Temperature.");
             }
 
-            double baseValue1 = ConvertToBaseUnit(value1, unit1, quantityType);
-            double baseValue2 = ConvertToBaseUnit(value2, unit2, quantityType);
+            string displayUnit1 = FormatUnitName(unit1, normalizedQuantityType);
+            string displayUnit2 = FormatUnitName(unit2, normalizedQuantityType);
+
+            double baseValue1 = ConvertToBaseUnit(value1, unit1, normalizedQuantityType);
+            double baseValue2 = ConvertToBaseUnit(value2, unit2, normalizedQuantityType);
 
             if (baseValue2 == 0)
             {
@@ -91,7 +113,7 @@ namespace QuantityMeasurementAppBusinessLayer.Services
 
             double result = baseValue1 / baseValue2;
 
-            return $"{value1} {unit1} / {value2} {unit2} = {Math.Round(result, 4)}";
+            return $"{value1} {displayUnit1} / {value2} {displayUnit2} = {Math.Round(result, 4)}";
         }
 
         public List<MeasurementRecord> GetHistory()
@@ -130,6 +152,11 @@ namespace QuantityMeasurementAppBusinessLayer.Services
             {
                 throw new Exception("QuantityType is required.");
             }
+
+            string normalizedQuantityType = NormalizeQuantityType(quantityType);
+
+            ValidateUnitForQuantityType(fromUnit, normalizedQuantityType);
+            ValidateUnitForQuantityType(toUnit, normalizedQuantityType);
         }
 
         private void ValidateTwoValueRequest(double value1, string unit1, double value2, string unit2, string quantityType)
@@ -148,19 +175,51 @@ namespace QuantityMeasurementAppBusinessLayer.Services
             {
                 throw new Exception("QuantityType is required.");
             }
+
+            string normalizedQuantityType = NormalizeQuantityType(quantityType);
+
+            ValidateUnitForQuantityType(unit1, normalizedQuantityType);
+            ValidateUnitForQuantityType(unit2, normalizedQuantityType);
+        }
+
+        private string NormalizeQuantityType(string quantityType)
+        {
+            return quantityType.Trim().ToLower();
+        }
+
+        private void ValidateUnitForQuantityType(string unit, string quantityType)
+        {
+            string normalizedUnit = NormalizeUnit(unit);
+
+            var allowedUnits = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "length", new List<string> { "feet", "foot", "inch", "yard" } },
+                { "weight", new List<string> { "milligram", "gram", "kilogram" } },
+                { "volume", new List<string> { "milliliter", "liter" } },
+                { "temperature", new List<string> { "celsius", "fahrenheit", "kelvin" } }
+            };
+
+            if (!allowedUnits.ContainsKey(quantityType))
+            {
+                throw new Exception($"Invalid quantity type '{quantityType}'.");
+            }
+
+            if (!allowedUnits[quantityType].Contains(normalizedUnit))
+            {
+                throw new Exception($"Invalid unit '{unit}' for quantity type '{quantityType}'.");
+            }
         }
 
         private double ConvertToBaseUnit(double value, string unit, string quantityType)
         {
-            string normalizedQuantityType = quantityType.Trim().ToLower();
-            string normalizedUnit = unit.Trim().ToLower();
+            string normalizedUnit = NormalizeUnit(unit);
 
-            if (normalizedQuantityType == "temperature")
+            if (quantityType == "temperature")
             {
                 return ConvertTemperatureToCelsius(value, normalizedUnit);
             }
 
-            Dictionary<string, double> factors = GetUnitFactors(normalizedQuantityType);
+            Dictionary<string, double> factors = GetUnitFactors(quantityType);
 
             if (!factors.ContainsKey(normalizedUnit))
             {
@@ -172,15 +231,14 @@ namespace QuantityMeasurementAppBusinessLayer.Services
 
         private double ConvertFromBaseUnit(double value, string unit, string quantityType)
         {
-            string normalizedQuantityType = quantityType.Trim().ToLower();
-            string normalizedUnit = unit.Trim().ToLower();
+            string normalizedUnit = NormalizeUnit(unit);
 
-            if (normalizedQuantityType == "temperature")
+            if (quantityType == "temperature")
             {
                 return ConvertCelsiusToTarget(value, normalizedUnit);
             }
 
-            Dictionary<string, double> factors = GetUnitFactors(normalizedQuantityType);
+            Dictionary<string, double> factors = GetUnitFactors(quantityType);
 
             if (!factors.ContainsKey(normalizedUnit))
             {
@@ -195,16 +253,16 @@ namespace QuantityMeasurementAppBusinessLayer.Services
             switch (quantityType)
             {
                 case "length":
-                    return new Dictionary<string, double>
+                    return new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase)
                     {
-                        { "millimeter", 0.001 },
-                        { "centimeter", 0.01 },
-                        { "meter", 1 },
-                        { "kilometer", 1000 }
+                        { "feet", 12 },
+                        { "foot", 12 },
+                        { "inch", 1 },
+                        { "yard", 36 }
                     };
 
                 case "weight":
-                    return new Dictionary<string, double>
+                    return new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase)
                     {
                         { "milligram", 0.001 },
                         { "gram", 1 },
@@ -212,7 +270,7 @@ namespace QuantityMeasurementAppBusinessLayer.Services
                     };
 
                 case "volume":
-                    return new Dictionary<string, double>
+                    return new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase)
                     {
                         { "milliliter", 0.001 },
                         { "liter", 1 }
@@ -257,6 +315,62 @@ namespace QuantityMeasurementAppBusinessLayer.Services
                 default:
                     throw new Exception("Invalid temperature unit.");
             }
+        }
+
+        private string NormalizeUnit(string unit)
+        {
+            return unit.Trim().ToLower();
+        }
+
+        private string FormatUnitName(string unit, string quantityType)
+        {
+            string normalizedUnit = NormalizeUnit(unit);
+
+            if (quantityType == "length")
+            {
+                return normalizedUnit switch
+                {
+                    "feet" => "Feet",
+                    "foot" => "Foot",
+                    "inch" => "Inch",
+                    "yard" => "Yard",
+                    _ => unit
+                };
+            }
+
+            if (quantityType == "weight")
+            {
+                return normalizedUnit switch
+                {
+                    "milligram" => "Milligram",
+                    "gram" => "Gram",
+                    "kilogram" => "Kilogram",
+                    _ => unit
+                };
+            }
+
+            if (quantityType == "volume")
+            {
+                return normalizedUnit switch
+                {
+                    "milliliter" => "Milliliter",
+                    "liter" => "Liter",
+                    _ => unit
+                };
+            }
+
+            if (quantityType == "temperature")
+            {
+                return normalizedUnit switch
+                {
+                    "celsius" => "Celsius",
+                    "fahrenheit" => "Fahrenheit",
+                    "kelvin" => "Kelvin",
+                    _ => unit
+                };
+            }
+
+            return unit;
         }
     }
 }
